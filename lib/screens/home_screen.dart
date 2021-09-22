@@ -216,7 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
               applicationBloc.searchPlaces(query);
               currentQuery = query;
             },
-            transition: ExpandingFloatingSearchBarTransition(),
+            transition: SlideFadeFloatingSearchBarTransition(),
             actions: [
               FloatingSearchBarAction(
                 showIfOpened: false,
@@ -225,7 +225,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () {
                     //weatherCall();
                     rendering = true;
-                    log(rendering.toString());
                     applicationBloc.setCurrentLocation();
                     setState(() {
                       startTimer();
@@ -376,13 +375,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<Onecall?> loadOneCall() async {
-    await waitForASecond();
+    //await waitForASecond();
     return await DataService.weatherData;
   }
 
-  Future<void> waitForASecond() async {
-    await Future.delayed(const Duration(seconds: 2), () {});
-  }
+  //Future<void> waitForASecond() async {
+  //  await Future.delayed(const Duration(seconds: 2), () {});
+  //}
 
   void startTimer() {
     const oneSec = Duration(milliseconds: 1500);
@@ -417,6 +416,10 @@ class _HomeScreenState extends State<HomeScreen> {
       'assets/cloudy.jpg',
       fit: BoxFit.fitHeight,
     );
+  }
+
+  refresh() {
+    setState(() {});
   }
 
   @override
@@ -460,7 +463,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => SettingsScreen(title: "Settings")),
+                    MaterialPageRoute(
+                      builder: (context) => SettingsPage(
+                        notifyParent: refresh,
+                      ),
+                    ),
                   );
                 },
               ),

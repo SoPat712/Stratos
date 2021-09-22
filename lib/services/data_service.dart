@@ -5,28 +5,24 @@ import 'package:ih8clouds/models/json/one_call.dart';
 import 'package:ih8clouds/services/networking.dart';
 import 'package:ih8clouds/settings/shared_prefs.dart';
 
-bool imperial = true;
-String unit = "";
-
 class DataService {
   // ignore: prefer_typing_uninitialized_variables
+
   static var weatherData;
+  static String unit = "";
+  static Future<void> initialize() async {
+    bool useImperial = await SharedPrefs.getImperial();
+    unit = useImperial ? "imperial" : "metric";
+  }
 
   static Future<void> getWeather(double latitude, double longitude) async {
+    await initialize();
     final String? appID = dotenv.env['OPENWEATHER_API_KEY'];
-    imperial = await SharedPrefs.getImperial();
-    if (imperial) {
-      unit = "imperial";
-    } else {
-      unit = "metric";
-    }
     final String url = "https://api.openweathermap.org/data/2.5/onecall?lat=" +
         latitude.toString() +
         "&lon=" +
         longitude.toString() +
-        "&units=" +
-        unit +
-        "&exclude=minutely&appid=" +
+        "&units=$unit&exclude=minutely&appid=" +
         appID!;
 
     log("Url: " + url);
