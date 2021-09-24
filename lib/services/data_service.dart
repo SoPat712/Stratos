@@ -1,9 +1,9 @@
 import 'dart:developer';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:stratus/models/json/one_call.dart';
-import 'package:stratus/services/networking.dart';
-import 'package:stratus/settings/shared_prefs.dart';
+import 'package:Stratus/models/json/one_call.dart';
+import 'package:Stratus/services/networking.dart';
+import 'package:Stratus/settings/shared_prefs.dart';
 
 class DataService {
   // ignore: prefer_typing_uninitialized_variables

@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.stratus">
+    package="com.jp12.Stratus">
    <application
-        android:label="stratus"
+        android:label="Stratus"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

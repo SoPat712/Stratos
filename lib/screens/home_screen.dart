@@ -6,15 +6,15 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:stratus/blocs/application_bloc.dart';
-import 'package:stratus/extensions/time_extension.dart';
-import 'package:stratus/models/json/one_call.dart';
-import 'package:stratus/models/location/place.dart';
-import 'package:stratus/screens/settings_screen.dart';
-import 'package:stratus/services/data_service.dart';
-import 'package:stratus/widgets/body.dart';
-import 'package:stratus/widgets/daily_card.dart';
-import 'package:stratus/widgets/hourly_card.dart';
+import 'package:Stratus/blocs/application_bloc.dart';
+import 'package:Stratus/extensions/time_extension.dart';
+import 'package:Stratus/models/json/one_call.dart';
+import 'package:Stratus/models/location/place.dart';
+import 'package:Stratus/screens/settings_screen.dart';
+import 'package:Stratus/services/data_service.dart';
+import 'package:Stratus/widgets/body.dart';
+import 'package:Stratus/widgets/daily_card.dart';
+import 'package:Stratus/widgets/hourly_card.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -440,7 +440,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Column(
                   children: const <Widget>[
-                    Text('stratus'),
+                    Text('Stratus'),
                   ],
                 ),
               ),

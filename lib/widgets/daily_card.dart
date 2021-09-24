@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:stratus/models/json/one_call.dart';
-import 'package:stratus/services/time.dart';
-import 'package:stratus/widgets/components/daily_list.dart';
+import 'package:Stratus/models/json/one_call.dart';
+import 'package:Stratus/services/time.dart';
+import 'package:Stratus/widgets/components/daily_list.dart';
 import 'package:weather_icons/weather_icons.dart';
 
 class DailyCard extends StatelessWidget {

@@ -9,7 +9,7 @@ class SharedPrefs {
 
   static Future<bool> getImperial() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool value = prefs.getBool(imperialKey) ?? true;
+    bool value = prefs.getBool(imperialKey) ?? false;
     return value;
   }
 

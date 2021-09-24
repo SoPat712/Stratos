@@ -1,4 +1,4 @@
-import 'package:stratus/settings/shared_prefs.dart';
+import 'package:Stratus/settings/shared_prefs.dart';
 import 'package:intl/intl.dart';
 
 class TimeHelper {

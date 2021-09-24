@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
-import 'package:stratus/extensions/string_extension.dart';
-import 'package:stratus/models/json/one_call.dart';
-import 'package:stratus/widgets/icons/weather_icon_current.dart';
+import 'package:Stratus/extensions/string_extension.dart';
+import 'package:Stratus/models/json/one_call.dart';
+import 'package:Stratus/widgets/icons/weather_icon_current.dart';
 
 var someCapitalizedString = "someString".capitalize();
 
@@ -67,8 +67,8 @@ class Body extends StatelessWidget {
               ),
               Container(
                 alignment: Alignment.topRight,
-                width: 120,
-                height: 120,
+                width: 130,
+                height: 130,
                 child: Align(
                   alignment: Alignment.center,
                   child: WeatherIconCurrent(

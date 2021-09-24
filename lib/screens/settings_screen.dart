@@ -2,15 +2,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:stratus/blocs/application_bloc.dart';
-import 'package:stratus/services/data_service.dart';
-import 'package:stratus/settings/shared_prefs.dart';
+import 'package:Stratus/blocs/application_bloc.dart';
+import 'package:Stratus/services/data_service.dart';
+import 'package:Stratus/settings/shared_prefs.dart';
 import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatefulWidget {
-  SettingsPage({Key? key, required this.notifyParent}) : super(key: key);
+  const SettingsPage({Key? key, required this.notifyParent}) : super(key: key);
 
   final Function() notifyParent;
 
@@ -70,7 +70,7 @@ class _SettingsPageState extends State<SettingsPage> {
         ),*/
         SettingsSection(
           title: 'General',
-          titlePadding: EdgeInsets.only(
+          titlePadding: const EdgeInsets.only(
             top: 20,
             left: 70,
           ),
@@ -79,7 +79,7 @@ class _SettingsPageState extends State<SettingsPage> {
               switchValue: unit,
               title: 'Units',
               subtitle: (!unit) ? "Imperial" : "Metric",
-              leading: Icon(FlutterIcons.tape_measure_mco),
+              leading: const Icon(FlutterIcons.tape_measure_mco),
               onToggle: (bool value) async {
                 await SharedPrefs.setImperial(value);
                 await initialize();
@@ -96,7 +96,7 @@ class _SettingsPageState extends State<SettingsPage> {
               switchValue: twelveHour,
               title: 'Time',
               subtitle: (!twelveHour) ? "12 Hour" : "24 Hour",
-              leading: Icon(FlutterIcons.clock_faw5),
+              leading: const Icon(FlutterIcons.clock_faw5),
               onToggle: (bool value) async {
                 await SharedPrefs.set24(value);
                 await initialize();
@@ -128,16 +128,16 @@ class _SettingsPageState extends State<SettingsPage> {
         ),*/
         SettingsSection(
           title: 'About',
-          titlePadding: EdgeInsets.only(
+          titlePadding: const EdgeInsets.only(
             top: 20,
             left: 70,
           ),
           tiles: [
             SettingsTile(
               title: 'Github',
-              leading: Icon(FlutterIcons.github_ant),
+              leading: const Icon(FlutterIcons.github_ant),
               onPressed: (BuildContext context) {
-                launch("https://github.com/SoPat712/stratus");
+                launch("https://github.com/SoPat712/Stratus");
               },
             ),
           ],
