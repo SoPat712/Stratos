@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ih8clouds/extensions/string_extension.dart';
 import 'package:ih8clouds/models/json/one_call.dart';
+import 'package:ih8clouds/services/temp.dart';
 import 'package:ih8clouds/services/time.dart';
 import 'package:ih8clouds/widgets/icons/weather_icon_hourly.dart';
 
@@ -36,17 +37,15 @@ class HourlyTile extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height: 75,
-            width: 75,
-            child: Align(
-                alignment: Alignment.center,
-                child: WeatherIconHourly(
-                  response: response,
-                  index: index,
-                )),
-          ),
+              height: 75,
+              width: 75,
+              child: WeatherIconHourly(
+                response: response,
+                index: index,
+              ),),
           Text(
-            response!.hourly![index].temp!.round().toString() + "°F",
+            TempHelper.getReadableTemp(
+                response!.hourly![index].temp!.round().toString()),
             style: const TextStyle(
               color: Colors.black,
               fontSize: 15,

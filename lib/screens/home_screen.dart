@@ -413,7 +413,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget buildMap() {
     return Image.asset(
-      'assets/cloudy.jpg',
+      'assets/sunny.jpg',
       fit: BoxFit.fitHeight,
     );
   }
@@ -461,6 +461,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 leading: const Icon(Icons.settings),
                 title: const Text('Settings'),
                 onTap: () {
+                  toggleDrawer();
                   Navigator.push(
                     context,
                     MaterialPageRoute(

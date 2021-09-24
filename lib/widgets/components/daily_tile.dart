@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ih8clouds/extensions/string_extension.dart';
 import 'package:ih8clouds/models/json/one_call.dart';
+import 'package:ih8clouds/services/temp.dart';
 import 'package:ih8clouds/services/time.dart';
 import 'package:ih8clouds/widgets/icons/weather_icon_daily.dart';
 
@@ -40,26 +41,22 @@ class DailyTile extends StatelessWidget {
           SizedBox(
             height: 75,
             width: 75,
-            child: Align(
-                alignment: Alignment.center,
-                child: WeatherIconDaily(
-                  response: response,
-                  index: index,
-                )),
+            child: WeatherIconDaily(
+              response: response,
+              index: index,
+            ),
           ),
-          /*
-          Image.network('https://openweathermap.org/img/wn/' +
-              response!.daily![index].weather![0].icon! +
-              '@2x.png'),*/
           Text(
-            response!.daily![index].temp!.max!.round().toString() + "°F",
+            TempHelper.getReadableTemp(
+                response!.daily![index].temp!.max!.round().toString()),
             style: const TextStyle(
               color: Colors.black,
               fontSize: 15,
             ),
           ),
           Text(
-            response!.daily![index].temp!.min!.round().toString() + "°F",
+            TempHelper.getReadableTemp(
+                response!.daily![index].temp!.min!.round().toString()),
             style: const TextStyle(
               color: Colors.black,
               fontSize: 15,

@@ -12,7 +12,7 @@ class DataService {
   static String unit = "";
   static Future<void> initialize() async {
     bool useImperial = await SharedPrefs.getImperial();
-    unit = useImperial ? "imperial" : "metric";
+    unit = useImperial ? "metric" : "imperial";
   }
 
   static Future<void> getWeather(double latitude, double longitude) async {

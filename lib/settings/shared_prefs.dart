@@ -9,8 +9,7 @@ class SharedPrefs {
 
   static Future<bool> getImperial() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    //if value is none return false
-    bool value = prefs.getBool(imperialKey) ?? false;
+    bool value = prefs.getBool(imperialKey) ?? true;
     return value;
   }
 
@@ -43,8 +42,8 @@ class SharedPrefs {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     //if value is none return false
     // ignore: unused_local_variable
-    bool value = prefs.getBool(h24key) ?? true;
-    return false;
+    bool value = prefs.getBool(h24key) ?? false;
+    return value;
   }
 
   static Future<void> set24(bool newValue) async {

@@ -20,7 +20,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool unit = false;
-
+  bool twelveHour = false;
   @override
   void initState() {
     super.initState();
@@ -29,8 +29,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> initialize() async {
     var info = await SharedPrefs.getImperial();
-
+    var info2 = await SharedPrefs.get24();
     setState(() {
+      twelveHour = info2;
       unit = info;
     });
   }
@@ -77,10 +78,27 @@ class _SettingsPageState extends State<SettingsPage> {
             SettingsTile.switchTile(
               switchValue: unit,
               title: 'Units',
-              subtitle: (unit) ? "Imperial" : "Metric",
+              subtitle: (!unit) ? "Imperial" : "Metric",
               leading: Icon(FlutterIcons.tape_measure_mco),
               onToggle: (bool value) async {
                 await SharedPrefs.setImperial(value);
+                await initialize();
+                await DataService.getWeather(
+                    applicationBloc
+                        .selectedLocationStatic!.geometry.location.lat,
+                    applicationBloc
+                        .selectedLocationStatic!.geometry.location.lng);
+                widget.notifyParent();
+                setState(() {});
+              },
+            ),
+            SettingsTile.switchTile(
+              switchValue: twelveHour,
+              title: 'Time',
+              subtitle: (!twelveHour) ? "12 Hour" : "24 Hour",
+              leading: Icon(FlutterIcons.clock_faw5),
+              onToggle: (bool value) async {
+                await SharedPrefs.set24(value);
                 await initialize();
                 await DataService.getWeather(
                     applicationBloc
@@ -130,38 +148,11 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final applicationBloc =
-        Provider.of<ApplicationBloc>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Settings Screen"),
+        title: const Text("Settings Screen"),
       ),
-      body: /*SettingsList(
-        sections: [
-          SettingsSection(
-            title: 'Section',
-            tiles: [
-              SettingsTile.switchTile(
-                title: 'Units',
-                leading: Icon(FlutterIcons.tape_measure_mco),
-                switchValue: unit,
-                onToggle: (bool value) async {
-                  await SharedPrefs.setImperial(value);
-                  await initialize();
-                  await DataService.getWeather(
-                      applicationBloc
-                          .selectedLocationStatic!.geometry.location.lat,
-                      applicationBloc
-                          .selectedLocationStatic!.geometry.location.lng);
-                  widget.notifyParent();
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
-    );*/
-          buildSettingsList(),
+      body: buildSettingsList(),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:ih8clouds/widgets/icons/star.dart';
 
@@ -88,8 +89,8 @@ class _LoadingScreenState extends State<LoadingScreen>
                       backgroundColor: Colors.transparent,
                       radius: 50.0,
                       child: Icon(
-                        Icons.wb_sunny,
-                        color: Colors.yellow,
+                        FlutterIcons.cloud_ant,
+                        color: Colors.grey,
                         size: 100.0,
                       ),
                     ),
