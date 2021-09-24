@@ -1,4 +1,4 @@
-package com.example.ih8clouds
+package com.example.stratus
 
 import io.flutter.embedding.android.FlutterActivity
 

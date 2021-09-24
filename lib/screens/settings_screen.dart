@@ -2,9 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:ih8clouds/blocs/application_bloc.dart';
-import 'package:ih8clouds/services/data_service.dart';
-import 'package:ih8clouds/settings/shared_prefs.dart';
+import 'package:stratus/blocs/application_bloc.dart';
+import 'package:stratus/services/data_service.dart';
+import 'package:stratus/settings/shared_prefs.dart';
 import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -137,7 +137,7 @@ class _SettingsPageState extends State<SettingsPage> {
               title: 'Github',
               leading: Icon(FlutterIcons.github_ant),
               onPressed: (BuildContext context) {
-                launch("https://github.com/SoPat712/ih8clouds");
+                launch("https://github.com/SoPat712/stratus");
               },
             ),
           ],

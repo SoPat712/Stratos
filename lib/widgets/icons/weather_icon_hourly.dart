@@ -4,7 +4,7 @@ import 'dart:developer';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:emojis/emoji.dart';
 import 'package:flutter/material.dart';
-import 'package:ih8clouds/models/json/one_call.dart';
+import 'package:stratus/models/json/one_call.dart';
 
 class WeatherIconHourly extends StatelessWidget {
   const WeatherIconHourly(

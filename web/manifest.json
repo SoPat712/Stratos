@@ -1,6 +1,6 @@
 {
-    "name": "ih8clouds",
-    "short_name": "ih8clouds",
+    "name": "stratus",
+    "short_name": "stratus",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

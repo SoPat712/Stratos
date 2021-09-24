@@ -1,10 +1,7 @@
-
-import 'package:ih8clouds/settings/shared_prefs.dart';
+import 'package:stratus/settings/shared_prefs.dart';
 import 'package:intl/intl.dart';
 
 class TimeHelper {
-
-
   static bool use24H = false;
 
   static void initialize() async {
@@ -22,25 +19,21 @@ class TimeHelper {
     return use24H ? DateFormat.Hm().format(time) : DateFormat.j().format(time);
   }
 
-
-  static DateTime getDateTimeSinceEpoch(int? secondsSinceEpoch, int? secondsTimezoneOffset) {
-
-
+  static DateTime getDateTimeSinceEpoch(
+      int? secondsSinceEpoch, int? secondsTimezoneOffset) {
     //convert from seconds to milliseconds
     int? millisecondsSinceEpoch = secondsSinceEpoch! * 1000;
     int? millisecondsTimezoneOffset = secondsTimezoneOffset! * 1000;
 
-
-
-
     //print(now.millisecondsSinceEpoch);
-
 
     //print(millisecondsTimezoneOffset);
     //print(millisecondsSinceEpoch);
 
     //apply the offset to the epoch time to get the correct time
-    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch((millisecondsSinceEpoch + millisecondsTimezoneOffset), isUtc: true);
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
+        (millisecondsSinceEpoch + millisecondsTimezoneOffset),
+        isUtc: true);
     //print(dateTime);
 
     //return the datetime object
@@ -50,13 +43,20 @@ class TimeHelper {
   static String getWeekdayAsString(int weekday) {
     //get the week day name from ISO 8601 weekday number
     switch (weekday) {
-      case 1: return "Monday";
-      case 2: return "Tuesday";
-      case 3: return "Wednesday";
-      case 4: return "Thursday";
-      case 5: return "Friday";
-      case 6: return "Saturday";
-      default: return "Sunday";
+      case 1:
+        return "Monday";
+      case 2:
+        return "Tuesday";
+      case 3:
+        return "Wednesday";
+      case 4:
+        return "Thursday";
+      case 5:
+        return "Friday";
+      case 6:
+        return "Saturday";
+      default:
+        return "Sunday";
     }
   }
 }

@@ -1,4 +1,4 @@
-import 'package:ih8clouds/models/location/coords.dart';
+import 'package:stratus/models/location/coords.dart';
 
 class Place {
   final Coords geometry;

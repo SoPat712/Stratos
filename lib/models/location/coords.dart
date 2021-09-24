@@ -1,4 +1,4 @@
-import 'package:ih8clouds/models/location/location.dart';
+import 'package:stratus/models/location/location.dart';
 
 class Coords {
   final Locale location;

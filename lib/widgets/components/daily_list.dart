@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ih8clouds/models/json/one_call.dart';
-import 'package:ih8clouds/widgets/components/daily_tile.dart';
+import 'package:stratus/models/json/one_call.dart';
+import 'package:stratus/widgets/components/daily_tile.dart';
 
 class DailyList extends StatelessWidget {
   const DailyList({Key? key, required this.response}) : super(key: key);

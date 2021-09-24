@@ -1,4 +1,4 @@
-# ih8clouds
+# stratus
 
 A new Flutter project.
 

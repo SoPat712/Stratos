@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ih8clouds/models/json/one_call.dart';
-import 'package:ih8clouds/settings/shared_prefs.dart';
+import 'package:stratus/models/json/one_call.dart';
+import 'package:stratus/settings/shared_prefs.dart';
 
 class TempHelper {
   static bool useF = false;

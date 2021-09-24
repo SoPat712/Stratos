@@ -6,15 +6,15 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:ih8clouds/blocs/application_bloc.dart';
-import 'package:ih8clouds/extensions/time_extension.dart';
-import 'package:ih8clouds/models/json/one_call.dart';
-import 'package:ih8clouds/models/location/place.dart';
-import 'package:ih8clouds/screens/settings_screen.dart';
-import 'package:ih8clouds/services/data_service.dart';
-import 'package:ih8clouds/widgets/body.dart';
-import 'package:ih8clouds/widgets/daily_card.dart';
-import 'package:ih8clouds/widgets/hourly_card.dart';
+import 'package:stratus/blocs/application_bloc.dart';
+import 'package:stratus/extensions/time_extension.dart';
+import 'package:stratus/models/json/one_call.dart';
+import 'package:stratus/models/location/place.dart';
+import 'package:stratus/screens/settings_screen.dart';
+import 'package:stratus/services/data_service.dart';
+import 'package:stratus/widgets/body.dart';
+import 'package:stratus/widgets/daily_card.dart';
+import 'package:stratus/widgets/hourly_card.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -440,7 +440,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Column(
                   children: const <Widget>[
-                    Text('IH8Clouds'),
+                    Text('stratus'),
                   ],
                 ),
               ),

@@ -1,7 +1,7 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:ih8clouds/models/location/place.dart';
-import 'package:ih8clouds/models/location/place_search.dart';
+import 'package:stratus/models/location/place.dart';
+import 'package:stratus/models/location/place_search.dart';
 import 'dart:convert' as convert;
 
 class PlacesService {

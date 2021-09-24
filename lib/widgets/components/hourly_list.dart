@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ih8clouds/models/json/one_call.dart';
-import 'package:ih8clouds/widgets/components/hourly_tile.dart';
+import 'package:stratus/models/json/one_call.dart';
+import 'package:stratus/widgets/components/hourly_tile.dart';
 
 class HourlyList extends StatelessWidget {
   const HourlyList({Key? key, required this.response}) : super(key: key);

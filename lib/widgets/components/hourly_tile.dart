@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:ih8clouds/extensions/string_extension.dart';
-import 'package:ih8clouds/models/json/one_call.dart';
-import 'package:ih8clouds/services/temp.dart';
-import 'package:ih8clouds/services/time.dart';
-import 'package:ih8clouds/widgets/icons/weather_icon_hourly.dart';
+import 'package:stratus/extensions/string_extension.dart';
+import 'package:stratus/models/json/one_call.dart';
+import 'package:stratus/services/temp.dart';
+import 'package:stratus/services/time.dart';
+import 'package:stratus/widgets/icons/weather_icon_hourly.dart';
 
 var someCapitalizedString = "someString".capitalize();
 
@@ -37,12 +37,13 @@ class HourlyTile extends StatelessWidget {
             ),
           ),
           SizedBox(
-              height: 75,
-              width: 75,
-              child: WeatherIconHourly(
-                response: response,
-                index: index,
-              ),),
+            height: 75,
+            width: 75,
+            child: WeatherIconHourly(
+              response: response,
+              index: index,
+            ),
+          ),
           Text(
             TempHelper.getReadableTemp(
                 response!.hourly![index].temp!.round().toString()),

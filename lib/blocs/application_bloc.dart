@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:ih8clouds/models/location/coords.dart';
-import 'package:ih8clouds/models/location/location.dart';
-import 'package:ih8clouds/models/location/place.dart';
-import 'package:ih8clouds/models/location/place_search.dart';
-import 'package:ih8clouds/services/geolocator_service.dart';
-import 'package:ih8clouds/services/places_service.dart';
+import 'package:stratus/models/location/coords.dart';
+import 'package:stratus/models/location/location.dart';
+import 'package:stratus/models/location/place.dart';
+import 'package:stratus/models/location/place_search.dart';
+import 'package:stratus/services/geolocator_service.dart';
+import 'package:stratus/services/places_service.dart';
 
 class ApplicationBloc with ChangeNotifier {
   ApplicationBloc() {

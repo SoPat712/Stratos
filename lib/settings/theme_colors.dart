@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ih8clouds/settings/shared_prefs.dart';
+import 'package:stratus/settings/shared_prefs.dart';
 
 class ThemeColors {
   static bool? isDark;
