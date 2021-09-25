@@ -25,6 +25,7 @@ class HourlyTile extends StatelessWidget {
             TimeHelper.getReadableTime(TimeHelper.getDateTimeSinceEpoch(
                 response!.hourly![index].dt, response!.timezoneOffset)),
             style: const TextStyle(
+              fontFamily: 'Proxima',
               color: Colors.black,
               fontSize: 15,
             ),
@@ -32,6 +33,7 @@ class HourlyTile extends StatelessWidget {
           Text(
             pop + "%",
             style: TextStyle(
+              fontFamily: 'Proxima',
               color: Colors.grey.shade700,
               fontSize: 10,
             ),
@@ -48,13 +50,11 @@ class HourlyTile extends StatelessWidget {
             TempHelper.getReadableTemp(
                 response!.hourly![index].temp!.round().toString()),
             style: const TextStyle(
+              fontFamily: 'Proxima',
               color: Colors.black,
               fontSize: 15,
             ),
           ),
-
-          //Text('Jun 28, 2018', style: new TextStyle(color: Colors.black)),
-          //Text('18:30', style: new TextStyle(color: Colors.black)),
         ],
       ),
     );

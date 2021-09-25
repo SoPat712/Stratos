@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:math' as math;
+import 'package:Stratus/widgets/icons/star.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:Stratus/blocs/application_bloc.dart';
@@ -27,9 +30,11 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  AnimationController? animationController;
   List<Placemark>? cityName;
   String currentQuery = "testquery";
+  bool disposeCalled = false;
   bool loading = false;
   StreamSubscription? locationSubscription;
   Place? placeSet;
@@ -42,6 +47,15 @@ class _HomeScreenState extends State<HomeScreen> {
   int _start = 3;
   // ignore: unused_field
   Timer? _timer;
+  Timer? timer;
+  bool called = false;
+  @override
+  void dispose() {
+    disposeCalled = true;
+    animationController!.dispose();
+    timer?.cancel();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -49,6 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Provider.of<ApplicationBloc>(context, listen: false);
     locationSubscription =
         applicationBloc.selectedLocation!.stream.listen((place) async {
+      called = true;
       log("Latitude: " + place.geometry.location.lat.toString());
       log("Longitude: " + place.geometry.location.lng.toString());
       cityName = await placemarkFromCoordinates(
@@ -58,7 +73,64 @@ class _HomeScreenState extends State<HomeScreen> {
           applicationBloc.selectedLocationStatic!.geometry.location.lng);
       setState(() {});
     });
+    animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    )..addStatusListener((AnimationStatus status) {
+        if (status == AnimationStatus.completed) {
+          if (!mounted) return;
+          animationController!.reverse();
+        }
+      });
     super.initState();
+    timer = Timer.periodic(Duration(seconds: 600), (Timer t) => updateVars());
+  }
+
+  void updateVars() async {
+    final applicationBloc =
+        Provider.of<ApplicationBloc>(context, listen: false);
+    if (called) {
+      log("Latitude: " +
+          applicationBloc.selectedLocationStatic!.geometry.location.lat
+              .toString());
+      log("Longitude: " +
+          applicationBloc.selectedLocationStatic!.geometry.location.lng
+              .toString());
+      cityName = await placemarkFromCoordinates(
+          applicationBloc.selectedLocationStatic!.geometry.location.lat,
+          applicationBloc.selectedLocationStatic!.geometry.location.lng);
+      await DataService.getWeather(
+          applicationBloc.selectedLocationStatic!.geometry.location.lat,
+          applicationBloc.selectedLocationStatic!.geometry.location.lng);
+      setState(() {});
+    } else {
+      log("No loc has been called yet");
+    }
+  }
+
+  void setAnimation() {
+    (!disposeCalled) ? animationController!.forward() : null;
+  }
+
+  List<Widget> makeStar(double width, double height) {
+    double starsInRow = width / 50;
+    double starsInColumn = height / 50;
+    double starsNum = starsInRow != 0
+        ? starsInRow * (starsInColumn != 0 ? starsInColumn : starsInRow)
+        : starsInColumn;
+
+    List<Widget> stars = [];
+    var rng = math.Random();
+
+    for (int i = 0; i < starsNum; i++) {
+      stars.add(Star(
+        top: rng.nextInt(height.floor()).toDouble(),
+        right: rng.nextInt(width.floor()).toDouble(),
+        animationController: animationController,
+      ));
+    }
+
+    return stars;
   }
 
   Widget futureWidget() {
@@ -208,6 +280,14 @@ class _HomeScreenState extends State<HomeScreen> {
             physics: const BouncingScrollPhysics(),
             axisAlignment: 0.0,
             openAxisAlignment: 0.0,
+            hintStyle: TextStyle(
+              fontFamily: 'Proxima',
+              fontSize: 16,
+            ),
+            queryStyle: TextStyle(
+              fontFamily: 'Proxima',
+              fontSize: 16,
+            ),
             //width: 600,
             //debounceDelay: const Duration(milliseconds: 1000),
             onQueryChanged: (query) async {
@@ -300,13 +380,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                         applicationBloc
                                             .searchResults![index].mainText,
                                         style: const TextStyle(
+                                            fontFamily: 'Proxima',
                                             color: Colors.black),
                                       )
                                     : (loading == false)
-                                        ? Text("No results for \"" +
-                                            currentQuery +
-                                            "\"!")
-                                        : const Text("Loading..."),
+                                        ? Text(
+                                            "No results for \"" +
+                                                currentQuery +
+                                                "\"!",
+                                            style: TextStyle(
+                                              fontFamily: 'Proxima',
+                                              fontSize: 18,
+                                            ),
+                                          )
+                                        : const Text(
+                                            "Loading...",
+                                            style: TextStyle(
+                                              fontFamily: 'Proxima',
+                                              fontSize: 18,
+                                            ),
+                                          ),
                                 subtitle: (applicationBloc
                                             .searchResults!.isNotEmpty &&
                                         loading == false)
@@ -345,7 +438,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             return ListTile(
                               shape: const ContinuousRectangleBorder(),
                               leading: const Icon(Icons.location_city),
-                              title: const Text("Current Location"),
+                              title: const Text(
+                                "Current Location",
+                                style: TextStyle(
+                                  fontFamily: 'Proxima',
+                                  fontSize: 18,
+                                ),
+                              ),
                               onTap: () {
                                 previousCallTypeCur = true;
                                 //weatherCall();
@@ -424,6 +523,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Timer.periodic(const Duration(seconds: 1), (Timer t) => setAnimation());
     final applicationBloc = Provider.of<ApplicationBloc>(context);
     return MaterialApp(
       home: Scaffold(
@@ -436,11 +536,23 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               DrawerHeader(
                 decoration: const BoxDecoration(
-                  color: Colors.blue,
+                  color: Colors.black,
                 ),
-                child: Column(
-                  children: const <Widget>[
-                    Text('Stratus'),
+                child: Stack(
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        Icon(
+                          FlutterIcons.cloud_ant,
+                          color: Colors.grey.shade100,
+                          size: 75.0,
+                        ),
+                      ],
+                    ),
+                    ...makeStar(MediaQuery.of(context).size.width,
+                        MediaQuery.of(context).size.height),
                   ],
                 ),
               ),

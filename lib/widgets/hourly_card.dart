@@ -31,6 +31,7 @@ class HourlyCard extends StatelessWidget {
               child: const Text(
                 "Hourly Forecast",
                 style: TextStyle(
+                  fontFamily: 'Proxima',
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                 ),

@@ -35,6 +35,7 @@ class DailyCard extends StatelessWidget {
                     TimeHelper.getReadableTime(TimeHelper.getDateTimeSinceEpoch(
                         response!.current!.dt, response!.timezoneOffset)),
                 style: TextStyle(
+                  fontFamily: 'Proxima',
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                   color: Colors.grey.shade700,
@@ -53,6 +54,7 @@ class DailyCard extends StatelessWidget {
               child: const Text(
                 "Daily Forecast",
                 style: TextStyle(
+                  fontFamily: 'Proxima',
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                 ),

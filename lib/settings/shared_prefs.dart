@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter/rendering.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPrefs {
@@ -49,6 +50,23 @@ class SharedPrefs {
   static Future<void> set24(bool newValue) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool(h24key, newValue);
+  }
+
+  //values for 24h time
+
+  static const String updateDuration = "useUpdateDuration";
+
+  static Future<int> getUpdateDuration() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    //if value is none return false
+    // ignore: unused_local_variable
+    int value = prefs.getInt(updateDuration) ?? 10;
+    return value;
+  }
+
+  static Future<void> setUpdateDuration(int newValue) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(updateDuration, newValue);
   }
 
   //values for wind unit

@@ -18,9 +18,7 @@ void main() {
 Future<void> initialize() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  await Settings.init(
-    cacheProvider: SharePreferenceCache(),
-  );
+
   initSettings().then((_) {
     ThemeColors.initialise().then(
       (value) => runApp(
@@ -30,7 +28,11 @@ Future<void> initialize() async {
   });
 }
 
-Future<void> initSettings() async {}
+Future<void> initSettings() async {
+  await Settings.init(
+    cacheProvider: SharePreferenceCache(),
+  );
+}
 
 class WeatherApp extends StatelessWidget {
   const WeatherApp({Key? key}) : super(key: key);
@@ -39,9 +41,10 @@ class WeatherApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => ApplicationBloc(),
-      child: const MaterialApp(
-        title: 'Flutter Demo',
-        home: HomeScreen(),
+      child: MaterialApp(
+        title: 'Stratus',
+        theme: ThemeData(fontFamily: 'Proxima'),
+        home: const HomeScreen(),
       ),
     );
   }

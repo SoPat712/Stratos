@@ -27,6 +27,7 @@ class DailyTile extends StatelessWidget {
                     response!.daily![index].dt, response!.timezoneOffset)
                 .weekday),
             style: const TextStyle(
+              fontFamily: 'Proxima',
               color: Colors.black,
               fontSize: 15,
             ),
@@ -34,6 +35,7 @@ class DailyTile extends StatelessWidget {
           Text(
             pop + "%",
             style: TextStyle(
+              fontFamily: 'Proxima',
               color: Colors.grey.shade700,
               fontSize: 10,
             ),
@@ -50,6 +52,7 @@ class DailyTile extends StatelessWidget {
             TempHelper.getReadableTemp(
                 response!.daily![index].temp!.max!.round().toString()),
             style: const TextStyle(
+              fontFamily: 'Proxima',
               color: Colors.black,
               fontSize: 15,
             ),
@@ -58,12 +61,11 @@ class DailyTile extends StatelessWidget {
             TempHelper.getReadableTemp(
                 response!.daily![index].temp!.min!.round().toString()),
             style: const TextStyle(
+              fontFamily: 'Proxima',
               color: Colors.black,
               fontSize: 15,
             ),
           ),
-          //Text('Jun 28, 2018', style: new TextStyle(color: Colors.black)),
-          //Text('18:30', style: new TextStyle(color: Colors.black)),
         ],
       ),
     );

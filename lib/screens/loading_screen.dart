@@ -19,7 +19,7 @@ class _LoadingScreenState extends State<LoadingScreen>
   bool disposeCalled = false;
 
   @override
-  dispose() {
+  void dispose() {
     disposeCalled = true;
     animationController!.dispose(); // you need this
     super.dispose();
@@ -67,7 +67,7 @@ class _LoadingScreenState extends State<LoadingScreen>
   @override
   Widget build(BuildContext context) {
     if (disposeCalled == false) {
-      Timer.periodic(const Duration(seconds: 1), (Timer t) => setAnimation());
+      Timer.periodic(const Duration(milliseconds: 500), (Timer t) => setAnimation());
     }
 
     return Stack(
@@ -85,14 +85,10 @@ class _LoadingScreenState extends State<LoadingScreen>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
-                    CircleAvatar(
-                      backgroundColor: Colors.transparent,
-                      radius: 50.0,
-                      child: Icon(
-                        FlutterIcons.cloud_ant,
-                        color: Colors.grey,
-                        size: 100.0,
-                      ),
+                    Icon(
+                      FlutterIcons.cloud_ant,
+                      color: Colors.grey,
+                      size: 100.0,
                     ),
                   ],
                 ),
