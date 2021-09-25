@@ -95,7 +95,7 @@ class _SettingsPageState extends State<SettingsPage> {
             SettingsTile.switchTile(
               switchValue: twelveHour,
               title: 'Time Format',
-              subtitle: (!twelveHour) ? "12 Hour" : "24 Hour",
+              subtitle: (twelveHour) ? "24 Hour" : "12 Hour",
               leading: const Icon(FlutterIcons.clock_faw5),
               onToggle: (bool value) async {
                 await SharedPrefs.set24(value);

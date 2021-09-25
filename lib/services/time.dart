@@ -13,7 +13,6 @@ class TimeHelper {
     return use24H ? DateFormat.Hm().format(time) : DateFormat.jm().format(time);
   }
 
-  //get shorthand version, ie 6PM
   static String getShortReadableTime(DateTime time) {
     initialize();
     return use24H ? DateFormat.Hm().format(time) : DateFormat.j().format(time);

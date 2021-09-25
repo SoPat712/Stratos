@@ -439,7 +439,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final applicationBloc = Provider.of<ApplicationBloc>(context);
     return MaterialApp(
       home: Scaffold(
-        backgroundColor: Colors.blue.shade400,
+        backgroundColor: Colors.blue.shade700,
         resizeToAvoidBottomInset: false,
         key: _scaffoldKey,
         drawer: Drawer(
