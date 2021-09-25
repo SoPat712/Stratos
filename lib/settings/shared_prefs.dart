@@ -1,22 +1,21 @@
 import 'dart:developer';
 
-import 'package:flutter/rendering.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPrefs {
   //values for imperial
 
-  static const String imperialKey = "useImperial";
+  static const String metricKey = "useMetric";
 
-  static Future<bool> getImperial() async {
+  static Future<bool> getMetric() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool value = prefs.getBool(imperialKey) ?? false;
+    bool value = prefs.getBool(metricKey) ?? false;
     return value;
   }
 
-  static Future<void> setImperial(bool newValue) async {
+  static Future<void> setMetric(bool newValue) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(imperialKey, newValue);
+    await prefs.setBool(metricKey, newValue);
   }
 
   //values  for dark mode

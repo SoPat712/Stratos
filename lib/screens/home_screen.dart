@@ -1,24 +1,23 @@
+// ignore_for_file: import_of_legacy_library_into_null_safe
+
 import 'dart:async';
 import 'dart:developer';
 import 'dart:math' as math;
-import 'package:Stratus/screens/settings_screen_two.dart';
-import 'package:Stratus/widgets/icons/star.dart';
+import 'package:stratos/widgets/icons/star.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:Stratus/blocs/application_bloc.dart';
-import 'package:Stratus/extensions/time_extension.dart';
-import 'package:Stratus/models/json/one_call.dart';
-import 'package:Stratus/models/location/place.dart';
-import 'package:Stratus/screens/settings_screen.dart';
-import 'package:Stratus/services/data_service.dart';
-import 'package:Stratus/widgets/body.dart';
-import 'package:Stratus/widgets/daily_card.dart';
-import 'package:Stratus/widgets/hourly_card.dart';
+import 'package:stratos/blocs/application_bloc.dart';
+import 'package:stratos/extensions/time_extension.dart';
+import 'package:stratos/models/json/one_call.dart';
+import 'package:stratos/screens/settings_screen.dart';
+import 'package:stratos/services/data_service.dart';
+import 'package:stratos/widgets/body.dart';
+import 'package:stratos/widgets/daily_card.dart';
+import 'package:stratos/widgets/hourly_card.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -33,14 +32,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   AnimationController? animationController;
-  bool called = false;
   String cityName = "";
   String currentQuery = "testquery";
   bool disposeCalled = false;
   bool loading = false;
   StreamSubscription? locationSubscription;
-  Place? placeSet;
-  bool populated = false;
   String previousCall = "";
   bool previousCallTypeCur = true;
   bool rendering = false;
@@ -63,9 +59,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void initState() {
     final applicationBloc =
         Provider.of<ApplicationBloc>(context, listen: false);
+    applicationBloc.setCurrentLocation();
     locationSubscription =
         applicationBloc.selectedLocation!.stream.listen((place) async {
-      called = true;
       updateVars();
     });
     animationController = AnimationController(
@@ -78,26 +74,29 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         }
       });
     super.initState();
-    timer = Timer.periodic(Duration(seconds: 600), (Timer t) => updateVars());
+    timer =
+        Timer.periodic(const Duration(seconds: 600), (Timer t) => updateVars());
   }
 
   void updateVars() async {
     final applicationBloc =
         Provider.of<ApplicationBloc>(context, listen: false);
-    if (called) {
-      log("Latitude: " +
-          applicationBloc.selectedLocationStatic!.geometry.location.lat
-              .toString());
-      log("Longitude: " +
-          applicationBloc.selectedLocationStatic!.geometry.location.lng
-              .toString());
-      await DataService.getWeather(
-          applicationBloc.selectedLocationStatic!.geometry.location.lat,
-          applicationBloc.selectedLocationStatic!.geometry.location.lng);
-      setState(() {});
-    } else {
-      log("No loc has been called yet");
+
+    log("Latitude: " +
+        applicationBloc.selectedLocationStatic!.geometry.location.lat
+            .toString());
+    log("Longitude: " +
+        applicationBloc.selectedLocationStatic!.geometry.location.lng
+            .toString());
+    await DataService.getWeather(
+        applicationBloc.selectedLocationStatic!.geometry.location.lat,
+        applicationBloc.selectedLocationStatic!.geometry.location.lng);
+    if (previousCallTypeCur) {
+      cityName = applicationBloc.cityName;
     }
+    log("City name: " + cityName);
+
+    setState(() {});
   }
 
   void setAnimation() {
@@ -137,7 +136,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             clearQueryOnClose: true,
             body: Stack(
               children: [
-                buildMap(),
                 SizedBox(
                   height: double.infinity,
                   child: FloatingSearchBarScrollNotifier(
@@ -184,79 +182,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             HourlyCard(
                               response: snapshot.data,
                             ),
-                            /*
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    2.5,
-                    0,
-                    2.5,
-                    2.5,
-                  ),
-                  child: Card(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6)),
-                    child: Column(
-                      children: const <Widget>[
-                        SizedBox(
-                            width: double.infinity,
-                            height: 55,
-                            child: Text(
-                              "asdf",
-                              textAlign: TextAlign.left,
-                            ))
-                      ],
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    2.5,
-                    0,
-                    2.5,
-                    2.5,
-                  ),
-                  child: Card(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6)),
-                    child: Column(
-                      children: const <Widget>[
-                        SizedBox(
-                            width: double.infinity,
-                            height: 55,
-                            child: Text(
-                              "asdf",
-                              textAlign: TextAlign.left,
-                            ))
-                      ],
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    2.5,
-                    0,
-                    2.5,
-                    2.5,
-                  ),
-                  child: Card(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6)),
-                    child: Column(
-                      children: const <Widget>[
-                        SizedBox(
-                            width: double.infinity,
-                            height: 55,
-                            child: Text(
-                              "asdf",
-                              textAlign: TextAlign.left,
-                            ))
-                      ],
-                    ),
-                  ),
-                ),*/
                           ],
                         ),
                       ),
@@ -272,11 +197,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             physics: const BouncingScrollPhysics(),
             axisAlignment: 0.0,
             openAxisAlignment: 0.0,
-            hintStyle: TextStyle(
+            hintStyle: const TextStyle(
               fontFamily: 'Proxima',
               fontSize: 16,
             ),
-            queryStyle: TextStyle(
+            queryStyle: const TextStyle(
               fontFamily: 'Proxima',
               fontSize: 16,
             ),
@@ -294,14 +219,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 showIfOpened: false,
                 child: CircularButton(
                   icon: Icon(Icons.place, color: Colors.grey.shade800),
-                  onPressed: () {
-                    //weatherCall();
+                  onPressed: () async {
                     rendering = true;
-                    applicationBloc.setCurrentLocation();
+                    setState(() {});
+                    previousCallTypeCur = true;
+                    await applicationBloc.setCurrentLocation();
                     cityName = applicationBloc.cityName;
-                    setState(() {
-                      startTimer();
-                    });
+                    rendering = false;
                   },
                 ),
               ),
@@ -444,7 +368,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 log(rendering.toString());
                                 await applicationBloc.setCurrentLocation();
                                 cityName = applicationBloc.cityName;
-
                                 rendering = false;
                                 FloatingSearchBar.of(context)!.close();
                               },
@@ -516,7 +439,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final applicationBloc = Provider.of<ApplicationBloc>(context);
     return MaterialApp(
       home: Scaffold(
-        backgroundColor: Colors.redAccent,
+        backgroundColor: Colors.blue.shade400,
         resizeToAvoidBottomInset: false,
         key: _scaffoldKey,
         drawer: Drawer(
@@ -552,11 +475,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   children: <Widget>[
                     ListTile(
                       leading: const Icon(Icons.location_city),
-                      title: const Text('Current Location'),
-                      onTap: () {
+                      title: const Text(
+                        'Current Location',
+                        style: TextStyle(
+                          fontFamily: 'Proxima',
+                        ),
+                      ),
+                      onTap: () async {
                         //weatherCall();
                         rendering = true;
-                        applicationBloc.setCurrentLocation();
+                        previousCallTypeCur = true;
+
+                        await applicationBloc.setCurrentLocation();
+                        cityName = applicationBloc.cityName;
+
                         startTimer();
                         setState(() {
                           toggleDrawer();
@@ -576,7 +508,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       const Divider(),
                       ListTile(
                         leading: const Icon(Icons.settings),
-                        title: const Text('Settings'),
+                        title: const Text(
+                          'Settings',
+                          style: TextStyle(
+                            fontFamily: 'Proxima',
+                          ),
+                        ),
                         onTap: () {
                           toggleDrawer();
                           Navigator.push(
@@ -594,63 +531,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ],
           ),
         ),
-        /*Drawer(
-          child: ListView(
-            padding: const EdgeInsets.all(0.0),
-            children: [
-              DrawerHeader(
-                decoration: const BoxDecoration(
-                  color: Colors.black,
-                ),
-                child: Stack(
-                  children: [
-                    ...makeStar(MediaQuery.of(context).size.width,
-                        MediaQuery.of(context).size.height),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        Icon(
-                          FlutterIcons.cloud_ant,
-                          color: Colors.grey.shade100,
-                          size: 80.0,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.location_city),
-                title: const Text('Current Location'),
-                onTap: () {
-                  //weatherCall();
-                  rendering = true;
-                  applicationBloc.setCurrentLocation();
-                  startTimer();
-                  setState(() {
-                    toggleDrawer();
-                  });
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.settings),
-                title: const Text('Settings'),
-                onTap: () {
-                  toggleDrawer();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SettingsPage(
-                        notifyParent: refresh,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),*/
         body: futureWidget(),
       ),
     );

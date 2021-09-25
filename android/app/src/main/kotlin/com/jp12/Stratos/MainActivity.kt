@@ -1,4 +1,4 @@
-package com.jp12.Stratus
+package com.jp12.Stratos
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:Stratus/models/json/one_call.dart';
-import 'package:Stratus/widgets/components/hourly_list.dart';
+import 'package:stratos/models/json/one_call.dart';
+import 'package:stratos/widgets/components/hourly_list.dart';
 
 class HourlyCard extends StatelessWidget {
   const HourlyCard({Key? key, this.response}) : super(key: key);

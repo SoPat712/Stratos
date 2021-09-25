@@ -1,4 +1,4 @@
-import 'package:Stratus/models/location/location.dart';
+import 'package:stratos/models/location/location.dart';
 
 class Coords {
   final Locale location;

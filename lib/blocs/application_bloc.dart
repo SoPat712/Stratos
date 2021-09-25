@@ -3,17 +3,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:Stratus/models/location/coords.dart';
-import 'package:Stratus/models/location/location.dart';
-import 'package:Stratus/models/location/place.dart';
-import 'package:Stratus/models/location/place_search.dart';
-import 'package:Stratus/services/geolocator_service.dart';
-import 'package:Stratus/services/places_service.dart';
+import 'package:stratos/models/location/coords.dart';
+import 'package:stratos/models/location/location.dart';
+import 'package:stratos/models/location/place.dart';
+import 'package:stratos/models/location/place_search.dart';
+import 'package:stratos/services/geolocator_service.dart';
+import 'package:stratos/services/places_service.dart';
 
 class ApplicationBloc with ChangeNotifier {
-  ApplicationBloc() {
-    setCurrentLocation();
-  }
+  ApplicationBloc();
 
   String cityName = "";
   //Variables

@@ -1,13 +1,15 @@
-import 'package:Stratus/blocs/application_bloc.dart';
-import 'package:Stratus/services/data_service.dart';
-import 'package:Stratus/settings/shared_prefs.dart';
+// ignore_for_file: unused_import, import_of_legacy_library_into_null_safe
+
+import 'package:stratos/blocs/application_bloc.dart';
+import 'package:stratos/services/data_service.dart';
+import 'package:stratos/settings/shared_prefs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:provider/provider.dart';
 
 class AppSettings extends StatefulWidget {
-  AppSettings({Key? key, required this.notifyParent}) : super(key: key);
+  const AppSettings({Key? key, required this.notifyParent}) : super(key: key);
 
   final Function() notifyParent;
   @override
@@ -49,7 +51,7 @@ class _AppSettingsState extends State<AppSettings> {
               },
             ),
             SwitchSettingsTile(
-              leading: Icon(Icons.developer_mode),
+              leading: const Icon(Icons.developer_mode),
               settingKey: 'key-switch-dev-mode',
               title: 'Developer Settings',
               onChange: (value) {
@@ -57,7 +59,7 @@ class _AppSettingsState extends State<AppSettings> {
               },
               childrenIfEnabled: <Widget>[
                 CheckboxSettingsTile(
-                  leading: Icon(Icons.adb),
+                  leading: const Icon(Icons.adb),
                   settingKey: 'key-is-developer',
                   title: 'Developer Mode',
                   defaultValue: true,
@@ -66,7 +68,7 @@ class _AppSettingsState extends State<AppSettings> {
                   },
                 ),
                 SwitchSettingsTile(
-                  leading: Icon(Icons.usb),
+                  leading: const Icon(Icons.usb),
                   settingKey: 'key-is-usb-debugging',
                   title: 'USB Debugging',
                   onChange: (value) {
@@ -92,7 +94,7 @@ class _AppSettingsState extends State<AppSettings> {
                 title: 'App Settings',
                 children: <Widget>[
                   CheckboxSettingsTile(
-                    leading: Icon(Icons.adb),
+                    leading: const Icon(Icons.adb),
                     settingKey: 'key-is-developer',
                     title: 'Developer Mode',
                     onChange: (bool value) {
@@ -100,7 +102,7 @@ class _AppSettingsState extends State<AppSettings> {
                     },
                   ),
                   SwitchSettingsTile(
-                    leading: Icon(Icons.usb),
+                    leading: const Icon(Icons.usb),
                     settingKey: 'key-is-usb-debugging',
                     title: 'USB Debugging',
                     onChange: (value) {
@@ -115,7 +117,7 @@ class _AppSettingsState extends State<AppSettings> {
               settingKey: 'key-user-name',
               initialValue: 'admin',
               validator: (String username) {
-                if (username != null && username.length > 3) {
+                if (username.length > 3) {
                   return null;
                 }
                 return "User Name can't be smaller than 4 letters";
@@ -128,7 +130,7 @@ class _AppSettingsState extends State<AppSettings> {
               settingKey: 'key-user-password',
               obscureText: true,
               validator: (String password) {
-                if (password != null && password.length > 6) {
+                if (password.length > 6) {
                   return null;
                 }
                 return "Password can't be smaller than 7 letters";
@@ -145,7 +147,7 @@ class _AppSettingsState extends State<AppSettings> {
                   title: 'Daylight Time Saving',
                   enabledLabel: 'Enabled',
                   disabledLabel: 'Disabled',
-                  leading: Icon(Icons.timelapse),
+                  leading: const Icon(Icons.timelapse),
                   onChange: (value) {
                     debugPrint('key-day-light-saving: $value');
                   },
@@ -155,7 +157,7 @@ class _AppSettingsState extends State<AppSettings> {
                   title: 'Dark Mode',
                   enabledLabel: 'Enabled',
                   disabledLabel: 'Disabled',
-                  leading: Icon(Icons.palette),
+                  leading: const Icon(Icons.palette),
                   onChange: (value) {
                     debugPrint('jey-dark-mode: $value');
                   },
@@ -172,7 +174,7 @@ class _AppSettingsState extends State<AppSettings> {
                   title: 'Daylight Time Saving',
                   enabledLabel: 'Enabled',
                   disabledLabel: 'Disabled',
-                  leading: Icon(Icons.timelapse),
+                  leading: const Icon(Icons.timelapse),
                   onChange: (value) {
                     debugPrint('key-day-light-savings-2: $value');
                   },
@@ -182,7 +184,7 @@ class _AppSettingsState extends State<AppSettings> {
                   title: 'Dark Mode',
                   enabledLabel: 'Enabled',
                   disabledLabel: 'Disabled',
-                  leading: Icon(Icons.palette),
+                  leading: const Icon(Icons.palette),
                   onChange: (value) {
                     debugPrint('key-dark-mode-2: $value');
                   },
@@ -212,7 +214,7 @@ class _AppSettingsState extends State<AppSettings> {
             DropDownSettingsTile<int>(
               title: 'E-Mail View',
               settingKey: 'key-dropdown-email-view',
-              values: <int, String>{
+              values: const <int, String>{
                 2: 'Simple',
                 3: 'Adjusted',
                 4: 'Normal',
@@ -233,7 +235,7 @@ class _AppSettingsState extends State<AppSettings> {
             SimpleRadioSettingsTile(
               title: 'Sync Settings',
               settingKey: 'key-radio-sync-settings',
-              values: <String>[
+              values: const <String>[
                 'Never',
                 'Daily',
                 'Weekly',
@@ -248,7 +250,7 @@ class _AppSettingsState extends State<AppSettings> {
             SimpleDropDownSettingsTile(
               title: 'Beauty Filter',
               settingKey: 'key-dropdown-beauty-filter',
-              values: <String>[
+              values: const <String>[
                 'Simple',
                 'Normal',
                 'Little Special',
@@ -288,7 +290,7 @@ class _AppSettingsState extends State<AppSettings> {
             DropDownSettingsTile<int>(
               title: 'Preferred Sync Period',
               settingKey: 'key-dropdown-sync-period-2',
-              values: <int, String>{
+              values: const <int, String>{
                 0: 'Never',
                 1: 'Daily',
                 7: 'Weekly',
@@ -312,12 +314,12 @@ class _AppSettingsState extends State<AppSettings> {
               min: 0,
               max: 100,
               step: 1,
-              leading: Icon(Icons.volume_up),
+              leading: const Icon(Icons.volume_up),
               onChange: (value) {
                 debugPrint('\n===== on change end =====\n'
                     'key-slider-volume: $value'
                     '\n==========\n');
-                Future.delayed(Duration(seconds: 1), () {
+                Future.delayed(const Duration(seconds: 1), () {
                   Settings.setValue('key-slider-volume', 20.0);
                 });
               },
@@ -343,7 +345,7 @@ class _AppSettingsState extends State<AppSettings> {
               min: 1,
               max: 5,
               step: 0.1,
-              leading: Icon(Icons.aspect_ratio),
+              leading: const Icon(Icons.aspect_ratio),
               onChange: (value) {
                 debugPrint('\n===== on change =====\n'
                     'key-custom-ratio-slider-2: $value'

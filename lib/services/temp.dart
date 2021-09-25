@@ -1,9 +1,9 @@
-import 'package:Stratus/settings/shared_prefs.dart';
+import 'package:stratos/settings/shared_prefs.dart';
 
 class TempHelper {
   static bool useF = false;
   static void initialize() async {
-    useF = await SharedPrefs.getImperial();
+    useF = await SharedPrefs.getMetric();
   }
 
   static String getReadableTemp(String passed) {

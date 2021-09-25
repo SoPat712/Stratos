@@ -2,9 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:Stratus/blocs/application_bloc.dart';
-import 'package:Stratus/services/data_service.dart';
-import 'package:Stratus/settings/shared_prefs.dart';
+import 'package:stratos/blocs/application_bloc.dart';
+import 'package:stratos/services/data_service.dart';
+import 'package:stratos/settings/shared_prefs.dart';
 import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -28,7 +28,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> initialize() async {
-    var info = await SharedPrefs.getImperial();
+    var info = await SharedPrefs.getMetric();
     var info2 = await SharedPrefs.get24();
     setState(() {
       twelveHour = info2;
@@ -78,10 +78,10 @@ class _SettingsPageState extends State<SettingsPage> {
             SettingsTile.switchTile(
               switchValue: unit,
               title: 'Units',
-              subtitle: (!unit) ? "Imperial" : "Metric",
+              subtitle: (unit) ? "Metric" : "Imperial",
               leading: const Icon(FlutterIcons.tape_measure_mco),
               onToggle: (bool value) async {
-                await SharedPrefs.setImperial(value);
+                await SharedPrefs.setMetric(value);
                 await initialize();
                 await DataService.getWeather(
                     applicationBloc
@@ -94,7 +94,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             SettingsTile.switchTile(
               switchValue: twelveHour,
-              title: 'Time',
+              title: 'Time Format',
               subtitle: (!twelveHour) ? "12 Hour" : "24 Hour",
               leading: const Icon(FlutterIcons.clock_faw5),
               onToggle: (bool value) async {
@@ -137,7 +137,7 @@ class _SettingsPageState extends State<SettingsPage> {
               title: 'Github',
               leading: const Icon(FlutterIcons.github_ant),
               onPressed: (BuildContext context) {
-                launch("https://github.com/SoPat712/Stratus");
+                launch("https://github.com/SoPat712/Stratos");
               },
             ),
           ],

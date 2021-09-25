@@ -1,4 +1,4 @@
-# Stratus
+# Stratos
 
 A new Flutter project.
 

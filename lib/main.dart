@@ -1,10 +1,12 @@
+// ignore_for_file: import_of_legacy_library_into_null_safe
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
-import 'package:Stratus/settings/theme_colors.dart';
-import 'package:Stratus/screens/home_screen.dart';
+import 'package:stratos/settings/theme_colors.dart';
+import 'package:stratos/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'blocs/application_bloc.dart';
@@ -42,9 +44,10 @@ class WeatherApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => ApplicationBloc(),
       child: MaterialApp(
-        title: 'Stratus',
         theme: ThemeData(fontFamily: 'Proxima'),
         home: const HomeScreen(),
+        title: "Stratos",
+        debugShowCheckedModeBanner: false,
       ),
     );
   }

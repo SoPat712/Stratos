@@ -1,10 +1,12 @@
+// ignore_for_file: import_of_legacy_library_into_null_safe
+
 import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:Stratus/widgets/icons/star.dart';
+import 'package:stratos/widgets/icons/star.dart';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({Key? key}) : super(key: key);

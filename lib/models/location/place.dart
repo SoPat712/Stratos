@@ -1,4 +1,4 @@
-import 'package:Stratus/models/location/coords.dart';
+import 'package:stratos/models/location/coords.dart';
 
 class Place {
   final Coords geometry;

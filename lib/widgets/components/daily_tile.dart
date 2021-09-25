@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:Stratus/extensions/string_extension.dart';
-import 'package:Stratus/models/json/one_call.dart';
-import 'package:Stratus/services/temp.dart';
-import 'package:Stratus/services/time.dart';
-import 'package:Stratus/widgets/icons/weather_icon_daily.dart';
+import 'package:stratos/extensions/string_extension.dart';
+import 'package:stratos/models/json/one_call.dart';
+import 'package:stratos/services/temp.dart';
+import 'package:stratos/services/time.dart';
+import 'package:stratos/widgets/icons/weather_icon_daily.dart';
 
 var someCapitalizedString = "someString".capitalize();
 
