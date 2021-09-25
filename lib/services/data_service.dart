@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:Stratus/models/json/one_call.dart';
 import 'package:Stratus/services/networking.dart';
 import 'package:Stratus/settings/shared_prefs.dart';
+import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 
 class DataService {
   // ignore: prefer_typing_uninitialized_variables
@@ -11,7 +12,7 @@ class DataService {
   static var weatherData;
   static String unit = "";
   static Future<void> initialize() async {
-    bool useImperial = await SharedPrefs.getImperial();
+    bool useImperial = await Settings.getValue("useImperial", true);
     unit = useImperial ? "metric" : "imperial";
   }
 

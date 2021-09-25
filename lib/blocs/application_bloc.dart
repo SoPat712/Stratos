@@ -65,6 +65,11 @@ class ApplicationBloc with ChangeNotifier {
       cityName = placemarks[0].locality.toString() +
           ", " +
           placemarks[0].country.toString();
+    } else if (placemarks[0].locality!.isEmpty) {
+      cityName = placemarks[0].country.toString();
+    } else if (placemarks[0].administrativeArea!.isEmpty &&
+        placemarks[0].locality!.isEmpty) {
+      cityName = placemarks[0].country.toString();
     } else {
       cityName = placemarks[0].locality.toString() +
           ", " +
@@ -89,6 +94,11 @@ class ApplicationBloc with ChangeNotifier {
       cityName = placemarks[0].locality.toString() +
           ", " +
           placemarks[0].country.toString();
+    } else if (placemarks[0].locality!.isEmpty) {
+      cityName = placemarks[0].country.toString();
+    } else if (placemarks[0].administrativeArea!.isEmpty &&
+        placemarks[0].locality!.isEmpty) {
+      cityName = placemarks[0].country.toString();
     } else {
       cityName = placemarks[0].locality.toString() +
           ", " +

@@ -67,17 +67,20 @@ class _LoadingScreenState extends State<LoadingScreen>
   @override
   Widget build(BuildContext context) {
     if (disposeCalled == false) {
-      Timer.periodic(const Duration(milliseconds: 500), (Timer t) => setAnimation());
+      Timer.periodic(
+          const Duration(milliseconds: 500), (Timer t) => setAnimation());
     }
 
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        Container(
-          decoration: const BoxDecoration(
-            color: Colors.black,
-          ),
-          child: Column(
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.black,
+      ),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ...makeStar(MediaQuery.of(context).size.width,
+              MediaQuery.of(context).size.height),
+          Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               Expanded(
@@ -110,10 +113,8 @@ class _LoadingScreenState extends State<LoadingScreen>
               ),
             ],
           ),
-        ),
-        ...makeStar(MediaQuery.of(context).size.width,
-            MediaQuery.of(context).size.height),
-      ],
+        ],
+      ),
     );
   }
 }

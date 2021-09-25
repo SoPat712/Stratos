@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:math' as math;
+import 'package:Stratus/screens/settings_screen_two.dart';
 import 'package:Stratus/widgets/icons/star.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -32,7 +33,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   AnimationController? animationController;
-  List<Placemark>? cityName;
+  bool called = false;
+  String cityName = "";
   String currentQuery = "testquery";
   bool disposeCalled = false;
   bool loading = false;
@@ -42,13 +44,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String previousCall = "";
   bool previousCallTypeCur = true;
   bool rendering = false;
+  Timer? timer;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _start = 3;
   // ignore: unused_field
   Timer? _timer;
-  Timer? timer;
-  bool called = false;
+
   @override
   void dispose() {
     disposeCalled = true;
@@ -64,14 +66,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     locationSubscription =
         applicationBloc.selectedLocation!.stream.listen((place) async {
       called = true;
-      log("Latitude: " + place.geometry.location.lat.toString());
-      log("Longitude: " + place.geometry.location.lng.toString());
-      cityName = await placemarkFromCoordinates(
-          place.geometry.location.lat, place.geometry.location.lng);
-      await DataService.getWeather(
-          applicationBloc.selectedLocationStatic!.geometry.location.lat,
-          applicationBloc.selectedLocationStatic!.geometry.location.lng);
-      setState(() {});
+      updateVars();
     });
     animationController = AnimationController(
       vsync: this,
@@ -96,9 +91,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       log("Longitude: " +
           applicationBloc.selectedLocationStatic!.geometry.location.lng
               .toString());
-      cityName = await placemarkFromCoordinates(
-          applicationBloc.selectedLocationStatic!.geometry.location.lat,
-          applicationBloc.selectedLocationStatic!.geometry.location.lng);
       await DataService.getWeather(
           applicationBloc.selectedLocationStatic!.geometry.location.lat,
           applicationBloc.selectedLocationStatic!.geometry.location.lng);
@@ -113,8 +105,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   List<Widget> makeStar(double width, double height) {
-    double starsInRow = width / 50;
-    double starsInColumn = height / 50;
+    double starsInRow = width / 25;
+    double starsInColumn = height / 25;
     double starsNum = starsInRow != 0
         ? starsInRow * (starsInColumn != 0 ? starsInColumn : starsInRow)
         : starsInColumn;
@@ -273,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
               ],
             ),
-            hint: applicationBloc.cityName,
+            hint: cityName,
             scrollPadding: const EdgeInsets.only(top: 16, bottom: 46),
             transitionDuration: const Duration(milliseconds: 400),
             transitionCurve: Curves.easeInOut,
@@ -306,6 +298,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     //weatherCall();
                     rendering = true;
                     applicationBloc.setCurrentLocation();
+                    cityName = applicationBloc.cityName;
                     setState(() {
                       startTimer();
                     });
@@ -388,7 +381,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             "No results for \"" +
                                                 currentQuery +
                                                 "\"!",
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               fontFamily: 'Proxima',
                                               fontSize: 18,
                                             ),
@@ -406,25 +399,23 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     ? Text(applicationBloc
                                         .searchResults![index].secondaryText)
                                     : null,
-                                onTap: () {
+                                onTap: () async {
                                   rendering = true;
-                                  startTimer();
                                   setState(() {});
                                   previousCall = applicationBloc
                                       .searchResults![index].placeId;
                                   previousCallTypeCur = false;
                                   (applicationBloc.searchResults!.isNotEmpty)
-                                      ? applicationBloc.setSelectedLocation(
-                                          applicationBloc
+                                      ? await applicationBloc
+                                          .setSelectedLocation(applicationBloc
                                               .searchResults![index].placeId)
                                       : null;
                                   log(applicationBloc
                                       .searchResults![index].description);
-
-                                  Future.delayed(
-                                      const Duration(milliseconds: 1500), () {
-                                    FloatingSearchBar.of(context)!.close();
-                                  });
+                                  cityName = applicationBloc
+                                      .searchResults![index].description;
+                                  rendering = false;
+                                  FloatingSearchBar.of(context)!.close();
                                 },
                               ),
                             );
@@ -445,19 +436,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   fontSize: 18,
                                 ),
                               ),
-                              onTap: () {
+                              onTap: () async {
                                 previousCallTypeCur = true;
                                 //weatherCall();
                                 rendering = true;
-                                startTimer();
                                 setState(() {});
                                 log(rendering.toString());
-                                applicationBloc.setCurrentLocation();
+                                await applicationBloc.setCurrentLocation();
+                                cityName = applicationBloc.cityName;
 
-                                Future.delayed(
-                                    const Duration(milliseconds: 1500), () {
-                                  FloatingSearchBar.of(context)!.close();
-                                });
+                                rendering = false;
+                                FloatingSearchBar.of(context)!.close();
                               },
                             );
                           }),
@@ -531,6 +520,81 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         resizeToAvoidBottomInset: false,
         key: _scaffoldKey,
         drawer: Drawer(
+          // column holds all the widgets in the drawer
+          child: Column(
+            children: <Widget>[
+              DrawerHeader(
+                decoration: const BoxDecoration(
+                  color: Colors.black,
+                ),
+                child: Stack(
+                  children: [
+                    ...makeStar(MediaQuery.of(context).size.width,
+                        MediaQuery.of(context).size.height),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        Icon(
+                          FlutterIcons.cloud_ant,
+                          color: Colors.grey.shade100,
+                          size: 80.0,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                // ListView contains a group of widgets that scroll inside the drawer
+                child: ListView(
+                  padding: const EdgeInsets.all(0),
+                  children: <Widget>[
+                    ListTile(
+                      leading: const Icon(Icons.location_city),
+                      title: const Text('Current Location'),
+                      onTap: () {
+                        //weatherCall();
+                        rendering = true;
+                        applicationBloc.setCurrentLocation();
+                        startTimer();
+                        setState(() {
+                          toggleDrawer();
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              // This container holds the align
+              Align(
+                  alignment: FractionalOffset.bottomCenter,
+                  // This container holds all the children that will be aligned
+                  // on the bottom and should not scroll with the above ListView
+                  child: Column(
+                    children: <Widget>[
+                      const Divider(),
+                      ListTile(
+                        leading: const Icon(Icons.settings),
+                        title: const Text('Settings'),
+                        onTap: () {
+                          toggleDrawer();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SettingsPage(
+                                notifyParent: refresh,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ))
+            ],
+          ),
+        ),
+        /*Drawer(
           child: ListView(
             padding: const EdgeInsets.all(0.0),
             children: [
@@ -540,6 +604,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
                 child: Stack(
                   children: [
+                    ...makeStar(MediaQuery.of(context).size.width,
+                        MediaQuery.of(context).size.height),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -547,12 +613,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         Icon(
                           FlutterIcons.cloud_ant,
                           color: Colors.grey.shade100,
-                          size: 75.0,
+                          size: 80.0,
                         ),
                       ],
                     ),
-                    ...makeStar(MediaQuery.of(context).size.width,
-                        MediaQuery.of(context).size.height),
                   ],
                 ),
               ),
@@ -586,7 +650,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ],
           ),
-        ),
+        ),*/
         body: futureWidget(),
       ),
     );
