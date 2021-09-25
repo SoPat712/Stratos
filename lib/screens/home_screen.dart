@@ -74,6 +74,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         }
       });
     super.initState();
+    setState(() {
+      updateVars();
+    });
     timer =
         Timer.periodic(const Duration(seconds: 600), (Timer t) => updateVars());
   }

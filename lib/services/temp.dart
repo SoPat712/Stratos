@@ -1,13 +1,14 @@
-import 'package:stratos/settings/shared_prefs.dart';
+// ignore: import_of_legacy_library_into_null_safe
+import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 
 class TempHelper {
-  static bool useF = false;
-  static void initialize() async {
-    useF = await SharedPrefs.getMetric();
+  static bool unit = false;
+  static Future<void> initialize() async {
+    unit = await Settings.getValue("useMetric", false);
   }
 
-  static String getReadableTemp(String passed) {
-    initialize();
-    return useF ? passed + "°C" : passed + "°F";
+  static Future<String> getReadableTemp(String passed) async{
+    await initialize();
+    return unit ? passed + "°C" : passed + "°F";
   }
 }

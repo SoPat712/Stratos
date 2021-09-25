@@ -7,56 +7,76 @@ import 'package:stratos/widgets/icons/weather_icon_hourly.dart';
 
 var someCapitalizedString = "someString".capitalize();
 
-class HourlyTile extends StatelessWidget {
+class HourlyTile extends StatefulWidget {
   const HourlyTile({Key? key, required this.response, required this.index})
       : super(key: key);
 
   final int index;
   final Onecall? response;
+
+  @override
+  State<HourlyTile> createState() => _HourlyTileState();
+}
+
+class _HourlyTileState extends State<HourlyTile> {
+  String readableTime = "";
+  String readableTemp = "";
   @override
   Widget build(BuildContext context) {
-    final String pop = (response!.hourly![index].pop! * 100).toInt().toString();
-    return FittedBox(
-      fit: BoxFit.cover,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            TimeHelper.getReadableTime(TimeHelper.getDateTimeSinceEpoch(
-                response!.hourly![index].dt, response!.timezoneOffset)),
-            style: const TextStyle(
-              fontFamily: 'Proxima',
-              color: Colors.black,
-              fontSize: 15,
+    final String pop =
+        (widget.response!.hourly![widget.index].pop! * 100).toInt().toString();
+    return FutureBuilder(
+        future: getTempAndTime(),
+        builder: (context, snapshot) {
+          return FittedBox(
+            fit: BoxFit.cover,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  readableTime,
+                  style: const TextStyle(
+                    fontFamily: 'Proxima',
+                    color: Colors.black,
+                    fontSize: 15,
+                  ),
+                ),
+                Text(
+                  pop + "%",
+                  style: TextStyle(
+                    fontFamily: 'Proxima',
+                    color: Colors.grey.shade700,
+                    fontSize: 10,
+                  ),
+                ),
+                SizedBox(
+                  height: 75,
+                  width: 75,
+                  child: WeatherIconHourly(
+                    response: widget.response,
+                    index: widget.index,
+                  ),
+                ),
+                Text(
+                  readableTemp,
+                  style: const TextStyle(
+                    fontFamily: 'Proxima',
+                    color: Colors.black,
+                    fontSize: 15,
+                  ),
+                ),
+              ],
             ),
-          ),
-          Text(
-            pop + "%",
-            style: TextStyle(
-              fontFamily: 'Proxima',
-              color: Colors.grey.shade700,
-              fontSize: 10,
-            ),
-          ),
-          SizedBox(
-            height: 75,
-            width: 75,
-            child: WeatherIconHourly(
-              response: response,
-              index: index,
-            ),
-          ),
-          Text(
-            TempHelper.getReadableTemp(
-                response!.hourly![index].temp!.round().toString()),
-            style: const TextStyle(
-              fontFamily: 'Proxima',
-              color: Colors.black,
-              fontSize: 15,
-            ),
-          ),
-        ],
-      ),
-    );
+          );
+        });
+  }
+
+  getTempAndTime() async {
+    readableTime = await TimeHelper.getReadableTime(
+        TimeHelper.getDateTimeSinceEpoch(
+            widget.response!.hourly![widget.index].dt,
+            widget.response!.timezoneOffset));
+    readableTemp = await TempHelper.getReadableTemp(
+        widget.response!.hourly![widget.index].temp!.round().toString());
   }
 }

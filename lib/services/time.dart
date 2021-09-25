@@ -1,20 +1,21 @@
-import 'package:stratos/settings/shared_prefs.dart';
+// ignore: import_of_legacy_library_into_null_safe
+import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:intl/intl.dart';
 
 class TimeHelper {
-  static bool use24H = false;
 
-  static void initialize() async {
-    use24H = await SharedPrefs.get24();
+  static bool use24H = false;
+  static Future<void> initialize() async {
+    use24H = await Settings.getValue("use24h", false);
   }
 
-  static String getReadableTime(DateTime time) {
-    initialize();
+  static Future<String> getReadableTime(DateTime time) async{
+    await initialize();
     return use24H ? DateFormat.Hm().format(time) : DateFormat.jm().format(time);
   }
 
-  static String getShortReadableTime(DateTime time) {
-    initialize();
+  static Future<String> getShortReadableTime(DateTime time) async{
+    await initialize();
     return use24H ? DateFormat.Hm().format(time) : DateFormat.j().format(time);
   }
 

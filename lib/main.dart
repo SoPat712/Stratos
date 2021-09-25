@@ -47,7 +47,7 @@ class WeatherApp extends StatelessWidget {
         theme: ThemeData(fontFamily: 'Proxima'),
         home: const HomeScreen(),
         title: "Stratos",
-        debugShowCheckedModeBanner: false,
+        debugShowCheckedModeBanner: true,
       ),
     );
   }
