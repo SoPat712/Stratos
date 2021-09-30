@@ -82,41 +82,53 @@ class _LoadingScreenState extends State<LoadingScreen>
         children: [
           ...makeStar(MediaQuery.of(context).size.width,
               MediaQuery.of(context).size.height),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Expanded(
-                flex: 2,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(
-                      FlutterIcons.cloud_ant,
-                      color: Colors.grey,
-                      size: 100.0,
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const <Widget>[
-                    SpinKitFoldingCube(
-                      color: Colors.blue,
-                      size: 80,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 20.0),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          stratosLoadScreen(),
         ],
       ),
     );
+  }
+
+  Column stratosLoadScreen() {
+    return Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            stratosCloudIcon(),
+            stratosLoadingIcon(),
+          ],
+        );
+  }
+
+  Expanded stratosCloudIcon() {
+    return Expanded(
+              flex: 2,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(
+                    FlutterIcons.cloud_ant,
+                    color: Colors.grey,
+                    size: 100.0,
+                  ),
+                ],
+              ),
+            );
+  }
+
+  Expanded stratosLoadingIcon() {
+    return Expanded(
+              flex: 1,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const <Widget>[
+                  SpinKitFoldingCube(
+                    color: Colors.blue,
+                    size: 80,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 20.0),
+                  ),
+                ],
+              ),
+            );
   }
 }
