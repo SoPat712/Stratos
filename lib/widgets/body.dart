@@ -78,7 +78,7 @@ class Body extends StatelessWidget {
                   ),
                 ),
               ),
-              const Padding(padding: EdgeInsets.fromLTRB(0, 5, 0, 0)),
+              const Padding(padding: EdgeInsets.fromLTRB(0, 10, 0, 0)),
               Text(
                 response!.current!.weather![0].description
                     .toString()
@@ -86,8 +86,8 @@ class Body extends StatelessWidget {
                 style: const TextStyle(
                   fontFamily: 'Proxima',
                   color: Colors.white,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16,
                 ),
               ),
             ],
