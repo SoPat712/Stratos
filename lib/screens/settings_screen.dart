@@ -41,33 +41,6 @@ class _SettingsPageState extends State<SettingsPage> {
         Provider.of<ApplicationBloc>(context, listen: false);
     return SettingsList(
       sections: [
-        /*
-        SettingsSection(
-          title: 'Common',
-          titlePadding: EdgeInsets.only(
-            top: 20,
-            left: 70,
-          ),
-          tiles: [
-            SettingsTile(
-              title: 'Environment',
-              subtitle: 'Production',
-              leading: Icon(Icons.cloud_queue),
-            ),
-          ],
-        ),
-        SettingsSection(
-          title: 'Account',
-          titlePadding: EdgeInsets.only(
-            top: 20,
-            left: 70,
-          ),
-          tiles: [
-            SettingsTile(title: 'Phone number', leading: Icon(Icons.phone)),
-            SettingsTile(title: 'Email', leading: Icon(Icons.email)),
-            SettingsTile(title: 'Sign out', leading: Icon(Icons.exit_to_app)),
-          ],
-        ),*/
         SettingsSection(
           title: 'General',
           titlePadding: const EdgeInsets.only(
@@ -111,21 +84,6 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ],
         ),
-        /*
-        SettingsSection(
-          titlePadding: EdgeInsets.only(
-            top: 20,
-            left: 70,
-          ),
-          title: 'Misc',
-          tiles: [
-            SettingsTile(
-                title: 'Terms of Service', leading: Icon(Icons.description)),
-            SettingsTile(
-                title: 'Open source licenses',
-                leading: Icon(Icons.collections_bookmark)),
-          ],
-        ),*/
         SettingsSection(
           title: 'About',
           titlePadding: const EdgeInsets.only(
