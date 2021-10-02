@@ -146,6 +146,40 @@ class SharedPrefs {
         defaultLocationKey, [text, lat.toString(), long.toString()]);
   }
 
+  static Future<void> setHome(
+      {required String myHomeId,
+      required String myHomeFullName,
+      required String myHomeMainText,
+      required String myHomeSecondaryText}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString("homeFullName", myHomeFullName);
+    await prefs.setString("homeID", myHomeId);
+    await prefs.setString("homeMainText", myHomeMainText);
+    await prefs.setString("homeSecondaryText", myHomeSecondaryText);
+    log("Home set");
+  }
+
+  static Future<String> getHomeFullName() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String code = prefs.getString("homeFullName") ?? "";
+    return code;
+  }
+  static Future<String> getHomeID() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String code = prefs.getString("homeID") ?? "";
+    return code;
+  }
+  static Future<String> getHomeMainText() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String code = prefs.getString("homeMainText") ?? "";
+    return code;
+  }
+  static Future<String> getHomeSecondaryText() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String code = prefs.getString("homeSecondaryText") ?? "";
+    return code;
+  }
+
   static Future<void> removeDefaultLocation() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove(defaultLocationKey);
