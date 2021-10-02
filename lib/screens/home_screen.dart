@@ -1,8 +1,13 @@
-// ignore_for_file: import_of_legacy_library_into_null_safe
+// ignore_for_file: import_of_legacy_library_into_null_safe, unused_import
 
 import 'dart:async';
 import 'dart:developer';
 import 'dart:math' as math;
+import 'dart:ui';
+import 'package:flutter/animation.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
+import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stratos/services/places_service.dart';
 import 'package:stratos/widgets/icons/star.dart';
@@ -33,12 +38,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  // ignore: unused_field
+  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   AnimationController? animationController;
   String cityName = "";
+  SharedPreferences? prefs;
   String currentQuery = "";
   bool disposeCalled = false;
   bool loading = false;
   StreamSubscription? locationSubscription;
+  String myHomeFullName = "";
+  String myHomeId = "";
+  String myHomeMainText = "";
+  String myHomeSecondaryText = "";
   List<String> myPlacesFullName = [];
   List<String> myPlacesIds = [];
   List<String> myPlacesMainText = [];
@@ -62,72 +74,135 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void _saveList() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setStringList("placesFullName", myPlacesFullName);
-    prefs.setStringList("placesIds", myPlacesIds);
-    prefs.setStringList("placesMainText", myPlacesMainText);
-    prefs.setStringList("placesSecondaryText", myPlacesSecondaryText);
-    log("List Saved");
-    return;
-  }
-
-  void _getList() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    myPlacesFullName = prefs.getStringList("placesFullName")!;
-    myPlacesIds = prefs.getStringList("placesIds")!;
-    myPlacesMainText = prefs.getStringList("placesMainText")!;
-    myPlacesSecondaryText = prefs.getStringList("placesSecondaryText")!;
-    log("List received");
+  Future<void> setPrefs() async {
+    prefs = await SharedPreferences.getInstance();
     return;
   }
 
   @override
   void initState() {
+    super.initState();
     final applicationBloc =
         Provider.of<ApplicationBloc>(context, listen: false);
-    _getList();
-    applicationBloc.setCurrentLocation();
-    locationSubscription =
-        applicationBloc.selectedLocation!.stream.listen((place) async {
-      updateVars();
-    });
+
+    locationSubscription = applicationBloc.selectedLocation!.stream.listen(
+      (place) async {
+        previousCallTypeCur = false;
+        updateVars();
+      },
+    );
+
     animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
-    )..addStatusListener((AnimationStatus status) {
-        if (status == AnimationStatus.completed) {
-          if (!mounted) return;
-          animationController!.reverse();
-        }
-      });
-    super.initState();
-    setState(() {
-      updateVars();
-    });
+    );
+
+    initUpdateVars();
     timer =
         Timer.periodic(const Duration(seconds: 600), (Timer t) => updateVars());
+  }
+
+  void initUpdateVars() async {
+    final applicationBloc =
+        Provider.of<ApplicationBloc>(context, listen: false);
+    await setPrefs();
+    _getHome();
+    _getList();
+    if (myHomeId != "") {
+      homeLocationCall();
+    } else if (previousCallTypeCur) {
+      currentLocationCall();
+    }
+    log(
+        "Latitude: " +
+            applicationBloc.selectedLocationStatic!.geometry.location.lat
+                .toString(),
+        level: 0);
+    log(
+        "Longitude: " +
+            applicationBloc.selectedLocationStatic!.geometry.location.lng
+                .toString(),
+        level: 0);
+    await DataService.getWeather(
+        applicationBloc.selectedLocationStatic!.geometry.location.lat,
+        applicationBloc.selectedLocationStatic!.geometry.location.lng);
+    log("City name: " + cityName);
+    setState(
+      () {},
+    );
   }
 
   void updateVars() async {
     final applicationBloc =
         Provider.of<ApplicationBloc>(context, listen: false);
-
-    log("Latitude: " +
-        applicationBloc.selectedLocationStatic!.geometry.location.lat
-            .toString());
-    log("Longitude: " +
-        applicationBloc.selectedLocationStatic!.geometry.location.lng
-            .toString());
+    log(
+        "Latitude: " +
+            applicationBloc.selectedLocationStatic!.geometry.location.lat
+                .toString(),
+        level: 0);
+    log(
+        "Longitude: " +
+            applicationBloc.selectedLocationStatic!.geometry.location.lng
+                .toString(),
+        level: 0);
     await DataService.getWeather(
         applicationBloc.selectedLocationStatic!.geometry.location.lat,
         applicationBloc.selectedLocationStatic!.geometry.location.lng);
-    if (previousCallTypeCur) {
-      cityName = applicationBloc.cityName;
-    }
+
     log("City name: " + cityName);
 
+    setState(
+      () {},
+    );
+  }
+
+  void currentLocationCall() async {
+    final applicationBloc =
+        Provider.of<ApplicationBloc>(context, listen: false);
+    await applicationBloc.setCurrentLocation();
+    cityName = applicationBloc.cityName;
+  }
+
+  void homeLocationCall() async {
+    final applicationBloc =
+        Provider.of<ApplicationBloc>(context, listen: false);
+    cityName = myHomeFullName;
+    await applicationBloc.setSelectedLocationNoSearch(myHomeId);
+  }
+
+  void _saveList() async {
+    prefs!.setStringList("placesFullName", myPlacesFullName);
+    prefs!.setStringList("placesIds", myPlacesIds);
+    prefs!.setStringList("placesMainText", myPlacesMainText);
+    prefs!.setStringList("placesSecondaryText", myPlacesSecondaryText);
+    log("List Saved");
+    return;
+  }
+
+  Future<void> _getHome() async {
+    myHomeFullName = prefs!.getString("homeFullName")!;
+    myHomeId = prefs!.getString("homeID")!;
+    myHomeMainText = prefs!.getString("homeMainText")!;
+    myHomeSecondaryText = prefs!.getString("homeSecondaryText")!;
     setState(() {});
+    return;
+  }
+
+  void _saveHome() async {
+    prefs!.setString("homeFullName", myHomeFullName);
+    prefs!.setString("homeID", myHomeId);
+    prefs!.setString("homeMainText", myHomeMainText);
+    prefs!.setString("homeSecondaryText", myHomeSecondaryText);
+    return;
+  }
+
+  Future<void> _getList() async {
+    myPlacesFullName = prefs!.getStringList("placesFullName")!;
+    myPlacesIds = prefs!.getStringList("placesIds")!;
+    myPlacesMainText = prefs!.getStringList("placesMainText")!;
+    myPlacesSecondaryText = prefs!.getStringList("placesSecondaryText")!;
+    setState(() {});
+    return;
   }
 
   void setAnimation() {
@@ -177,45 +252,23 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           const Duration(milliseconds: 1500),
                           () {
                             if (previousCallTypeCur) {
-                              setState(() {
-                                applicationBloc.setCurrentLocation();
-                              });
+                              setState(
+                                () {
+                                  applicationBloc.setCurrentLocation();
+                                },
+                              );
                             } else {
-                              setState(() {
-                                applicationBloc
-                                    .setSelectedLocation(previousCall);
-                              });
+                              setState(
+                                () {
+                                  applicationBloc.setSelectedLocationNoSearch(
+                                      previousCall);
+                                },
+                              );
                             }
                           },
                         );
                       },
-                      child: GlowingOverscrollIndicator(
-                        axisDirection: AxisDirection.down,
-                        color: Colors.transparent,
-                        child: ListView(
-                          physics: const ClampingScrollPhysics(),
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.fromLTRB(
-                                0,
-                                55,
-                                0,
-                                0,
-                              ),
-                            ),
-                            Body(
-                              date: DateTime.now().curTime(),
-                              response: snapshot.data,
-                            ),
-                            DailyCard(
-                              response: snapshot.data,
-                            ),
-                            HourlyCard(
-                              response: snapshot.data,
-                            ),
-                          ],
-                        ),
-                      ),
+                      child: stratosMainScreen(snapshot),
                     ),
                   ),
                 ),
@@ -236,13 +289,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               fontFamily: 'Proxima',
               fontSize: 16,
             ),
-            //width: 600,
-            //debounceDelay: const Duration(milliseconds: 1000),
             onQueryChanged: (query) async {
               loading = true;
               currentQuery = query;
               await applicationBloc.searchPlaces(query);
               startTimer();
+              setState(() {});
             },
             transition: SlideFadeFloatingSearchBarTransition(),
             actions: [
@@ -252,7 +304,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   icon: Icon(Icons.place, color: Colors.grey.shade800),
                   onPressed: () async {
                     rendering = true;
-                    setState(() {});
+                    setState(
+                      () {},
+                    );
                     previousCallTypeCur = true;
                     await applicationBloc.setCurrentLocation();
                     cityName = applicationBloc.cityName;
@@ -270,205 +324,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 child: Material(
                   color: Colors.white,
                   child: (currentQuery.isEmpty)
-                      ? ListView.builder(
-                          padding: const EdgeInsets.all(0.0),
-                          physics: const BouncingScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: 1,
-                          itemBuilder: (context, index) {
-                            return ListTile(
-                              shape: const RoundedRectangleBorder(
-                                side: BorderSide(color: Colors.white, width: 0),
-                              ),
-                              leading: const Icon(Icons.location_city),
-                              title: const Text(
-                                "Current Location",
-                                style: TextStyle(
-                                  fontFamily: 'Proxima',
-                                  fontSize: 18,
-                                ),
-                              ),
-                              onTap: () async {
-                                previousCallTypeCur = true;
-                                //weatherCall();
-                                rendering = true;
-                                setState(() {});
-                                log(rendering.toString());
-                                await applicationBloc.setCurrentLocation();
-                                cityName = applicationBloc.cityName;
-                                rendering = false;
-                                FloatingSearchBar.of(context)!.close();
-                              },
-                            );
-                          },
-                        )
-                      : (currentQuery.isNotEmpty &&
-                              applicationBloc.searchResults!.isEmpty &&
-                              loading == false)
-                          ? ListView.builder(
-                              padding: const EdgeInsets.all(0.0),
-                              physics: const BouncingScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: 1,
-                              itemBuilder: (context, index) {
-                                return ListTile(
-                                  shape: const RoundedRectangleBorder(
-                                    side: BorderSide(
-                                        color: Colors.white, width: 0),
-                                  ),
-                                  leading: const Icon(
-                                    Icons.error,
-                                    color: Colors.red,
-                                  ),
-                                  title: Text(
-                                    "No results for \"" + currentQuery + "\"!",
-                                    style: const TextStyle(
-                                      fontFamily: 'Proxima',
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                );
-                              })
-                          : (currentQuery.isNotEmpty && loading == true)
-                              ? ListView.builder(
-                                  padding: const EdgeInsets.all(0.0),
-                                  physics: const BouncingScrollPhysics(),
-                                  shrinkWrap: true,
-                                  itemCount: 1,
-                                  itemBuilder: (context, index) {
-                                    return ListTile(
-                                      shape: const RoundedRectangleBorder(
-                                        side: BorderSide(
-                                            color: Colors.white, width: 0),
-                                      ),
-                                      leading: SizedBox(
-                                        child: CircularProgressIndicator(
-                                          color: Colors.blue.shade400,
-                                        ),
-                                        height: 32,
-                                        width: 32,
-                                      ),
-                                      title: const Text(
-                                        "Loading...",
-                                        style: TextStyle(
-                                          fontFamily: 'Proxima',
-                                          fontSize: 18,
-                                        ),
-                                      ),
-                                    );
-                                  })
-                              : ListView.separated(
-                                  separatorBuilder: (context, index) {
-                                    return const Divider(
-                                      height: 0.2,
-                                      color: Colors.black38,
-                                      thickness: 0.3,
-                                      indent: 40,
-                                      endIndent: 15,
-                                    );
-                                  },
-                                  padding:
-                                      const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                  physics: const BouncingScrollPhysics(),
-                                  shrinkWrap: true,
-                                  itemCount:
-                                      applicationBloc.searchResults!.length,
-                                  itemBuilder: (context, index) {
-                                    return Slidable(
-                                      actionPane:
-                                          const SlidableDrawerActionPane(),
-                                      secondaryActions: <Widget>[
-                                        IconSlideAction(
-                                          caption: 'Pin',
-                                          color: Colors.yellow,
-                                          icon: Icons.pin,
-                                          onTap: () async {
-                                            if (myPlacesIds.contains(
-                                                applicationBloc
-                                                    .searchResults![index]
-                                                    .placeId)) {
-                                            } else {
-                                              myPlacesIds.add(applicationBloc
-                                                  .searchResults![index]
-                                                  .placeId);
-                                              myPlacesMainText.add(
-                                                  applicationBloc
-                                                      .searchResults![index]
-                                                      .mainText);
-                                              myPlacesSecondaryText.add(
-                                                  applicationBloc
-                                                      .searchResults![index]
-                                                      .secondaryText);
-                                              myPlacesFullName.add(
-                                                  applicationBloc
-                                                      .searchResults![index]
-                                                      .description);
-                                              _saveList();
-                                              setState(() {});
-                                            }
-                                          },
-                                        ),
-                                      ],
-                                      child: ListTile(
-                                        trailing: ((myPlacesIds.contains(
-                                                    applicationBloc
-                                                        .searchResults![index]
-                                                        .placeId)) &&
-                                                (loading == false))
-                                            ? const Icon(
-                                                Icons.star,
-                                                color: Colors.yellow,
-                                              )
-                                            : const Icon(
-                                                Icons.arrow_left,
-                                                color: Colors.black,
-                                              ),
-                                        shape: const RoundedRectangleBorder(
-                                          side: BorderSide(
-                                              color: Colors.white, width: 0),
-                                        ),
-                                        leading: Icon(
-                                          Icons.place,
-                                          color: Colors.grey.shade600,
-                                        ),
-                                        title: Text(
-                                          applicationBloc
-                                              .searchResults![index].mainText,
-                                          style: const TextStyle(
-                                              fontFamily: 'Proxima',
-                                              color: Colors.black),
-                                        ),
-                                        subtitle: Text(applicationBloc
-                                            .searchResults![index]
-                                            .secondaryText),
-                                        onTap: () async {
-                                          rendering = true;
-                                          setState(() {});
-                                          previousCall = applicationBloc
-                                              .searchResults![index].placeId;
-                                          previousCallTypeCur = false;
-                                          (applicationBloc
-                                                  .searchResults!.isNotEmpty)
-                                              ? await applicationBloc
-                                                  .setSelectedLocation(
-                                                      applicationBloc
-                                                          .searchResults![index]
-                                                          .placeId)
-                                              : null;
-                                          log(applicationBloc
-                                              .searchResults![index]
-                                              .description);
-                                          cityName = applicationBloc
-                                              .searchResults![index]
-                                              .description;
-                                          rendering = false;
-                                          FloatingSearchBar.of(context)!
-                                              .close();
-                                        },
-                                      ),
-                                    );
-                                  },
-                                ),
+                      ? emptyQueryListView()
+                      : (currentQuery.isNotEmpty && loading == true)
+                          ? loadingListView()
+                          : (currentQuery.isNotEmpty &&
+                                  applicationBloc.searchResults!.isNotEmpty)
+                              ? placesListView()
+                              : noResultsListView(),
                 ),
               );
             },
@@ -481,14 +343,235 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  Widget noResultsListView() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(0.0),
+      physics: const BouncingScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: 1,
+      itemBuilder: (context, index) {
+        return ListTile(
+          shape: const RoundedRectangleBorder(
+            side: BorderSide(color: Colors.white, width: 0),
+          ),
+          leading: const Icon(
+            Icons.error,
+            color: Colors.red,
+          ),
+          title: Text(
+            "No results for \"" + currentQuery + "\"!",
+            style: const TextStyle(
+              fontFamily: 'Proxima',
+              fontSize: 18,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget emptyQueryListView() {
+    final applicationBloc =
+        Provider.of<ApplicationBloc>(context, listen: false);
+    return ListView.builder(
+      padding: const EdgeInsets.all(0.0),
+      physics: const BouncingScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: 1,
+      itemBuilder: (context, index) {
+        return ListTile(
+          shape: const RoundedRectangleBorder(
+            side: BorderSide(color: Colors.white, width: 0),
+          ),
+          leading: const Icon(Icons.location_city),
+          title: const Text(
+            "Current Location",
+            style: TextStyle(
+              fontFamily: 'Proxima',
+              fontSize: 18,
+            ),
+          ),
+          onTap: () async {
+            previousCallTypeCur = true;
+            rendering = true;
+            setState(
+              () {},
+            );
+            log(rendering.toString());
+            await applicationBloc.setCurrentLocation();
+            cityName = applicationBloc.cityName;
+            rendering = false;
+            FloatingSearchBar.of(context)!.close();
+          },
+        );
+      },
+    );
+  }
+
+  Widget placesListView() {
+    final applicationBloc =
+        Provider.of<ApplicationBloc>(context, listen: false);
+    return ListView.separated(
+      separatorBuilder: (context, index) {
+        return const Divider(
+          height: 0.2,
+          color: Colors.black38,
+          thickness: 0.3,
+          indent: 40,
+          endIndent: 15,
+        );
+      },
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+      physics: const BouncingScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: applicationBloc.searchResults!.length,
+      itemBuilder: (context, index) {
+        return Slidable(
+          actionPane: const SlidableDrawerActionPane(),
+          secondaryActions: <Widget>[
+            IconSlideAction(
+              caption: 'Pin',
+              color: Colors.yellow,
+              icon: Icons.pin,
+              onTap: () async {
+                if (myPlacesIds
+                    .contains(applicationBloc.searchResults![index].placeId)) {
+                } else {
+                  myPlacesIds
+                      .add(applicationBloc.searchResults![index].placeId);
+                  myPlacesMainText
+                      .add(applicationBloc.searchResults![index].mainText);
+                  myPlacesSecondaryText
+                      .add(applicationBloc.searchResults![index].secondaryText);
+                  myPlacesFullName
+                      .add(applicationBloc.searchResults![index].description);
+                  _saveList();
+                  setState(
+                    () {},
+                  );
+                }
+              },
+            ),
+          ],
+          child: ListTile(
+            trailing: ((myPlacesIds.contains(
+                        applicationBloc.searchResults![index].placeId)) &&
+                    (loading == false))
+                ? const Icon(
+                    Icons.star,
+                    color: Colors.yellow,
+                  )
+                : const Icon(
+                    Icons.arrow_left,
+                    color: Colors.black,
+                  ),
+            shape: const RoundedRectangleBorder(
+              side: BorderSide(color: Colors.white, width: 0),
+            ),
+            leading: Icon(
+              Icons.place,
+              color: Colors.grey.shade600,
+            ),
+            title: Text(
+              applicationBloc.searchResults![index].mainText,
+              style:
+                  const TextStyle(fontFamily: 'Proxima', color: Colors.black),
+            ),
+            subtitle: Text(applicationBloc.searchResults![index].secondaryText),
+            onTap: () async {
+              rendering = true;
+              setState(
+                () {},
+              );
+              previousCall = applicationBloc.searchResults![index].placeId;
+              previousCallTypeCur = false;
+              (applicationBloc.searchResults!.isNotEmpty)
+                  ? await applicationBloc.setSelectedLocation(
+                      applicationBloc.searchResults![index].placeId)
+                  : null;
+              log(applicationBloc.searchResults![index].description);
+              cityName = applicationBloc.searchResults![index].description;
+
+              rendering = false;
+              FloatingSearchBar.of(context)!.close();
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget stratosMainScreen(AsyncSnapshot<Onecall?> snapshot) {
+    return GlowingOverscrollIndicator(
+      axisDirection: AxisDirection.down,
+      color: Colors.transparent,
+      child: ListView(
+        physics: const ClampingScrollPhysics(),
+        children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(
+              0,
+              55,
+              0,
+              0,
+            ),
+          ),
+          Body(
+            date: DateTime.now().curTime(),
+            response: snapshot.data,
+          ),
+          HourlyCard(
+            response: snapshot.data,
+          ),
+          DailyCard(
+            response: snapshot.data,
+          ),
+          
+        ],
+      ),
+    );
+  }
+
+  Widget loadingListView() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(0.0),
+      physics: const BouncingScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: 1,
+      itemBuilder: (context, index) {
+        return ListTile(
+          shape: const RoundedRectangleBorder(
+            side: BorderSide(color: Colors.white, width: 0),
+          ),
+          leading: SizedBox(
+            child: CircularProgressIndicator(
+              color: Colors.blue.shade400,
+            ),
+            height: 32,
+            width: 32,
+          ),
+          title: const Text(
+            "Loading...",
+            style: TextStyle(
+              fontFamily: 'Proxima',
+              fontSize: 18,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Future<Onecall?> loadOneCall() async {
-    //await waitForASecond();
     return await DataService.weatherData;
   }
 
-  //Future<void> waitForASecond() async {
-  //  await Future.delayed(const Duration(seconds: 2), () {});
-  //}
+  Future<void> waitForASecond() async {
+    await Future.delayed(
+      const Duration(milliseconds: 5000),
+      () {},
+    );
+  }
 
   void startTimer() {
     const oneSec = Duration(milliseconds: 1000);
@@ -497,10 +580,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       (Timer timer) => setState(
         () {
           if (_start < 1) {
-            setState(() {
-              loading = false;
-              rendering = false;
-            });
+            setState(
+              () {
+                loading = false;
+                rendering = false;
+              },
+            );
             timer.cancel();
           } else {
             _start = _start - 1;
@@ -518,212 +603,419 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
-  Widget buildMap() {
-    return Image.asset(
-      'assets/sunny.jpg',
-      fit: BoxFit.fitHeight,
+  void refresh() {
+    setState(
+      () {},
     );
   }
 
-  refresh() {
-    setState(() {});
+  Align stratosSettingsTile(BuildContext context) {
+    return Align(
+      alignment: FractionalOffset.bottomCenter,
+      child: Column(
+        children: <Widget>[
+          const Divider(
+            height: 0,
+          ),
+          ListTile(
+            contentPadding: const EdgeInsets.fromLTRB(
+              14,
+              2,
+              14,
+              2,
+            ),
+            trailing: const Icon(Icons.settings),
+            title: const Text(
+              'Settings',
+              style: TextStyle(
+                fontFamily: 'Proxima',
+                fontWeight: FontWeight.w600,
+                fontSize: 18,
+              ),
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SettingsPage(
+                    notifyParent: refresh,
+                  ),
+                ),
+              );
+              toggleDrawer();
+            },
+          ),
+        ],
+      ),
+    );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    Timer.periodic(const Duration(seconds: 1), (Timer t) => setAnimation());
-    final applicationBloc = Provider.of<ApplicationBloc>(context);
-    return MaterialApp(
-      home: Scaffold(
-        backgroundColor: Colors.blue.shade700,
-        resizeToAvoidBottomInset: false,
-        key: _scaffoldKey,
-        drawer: Drawer(
-          elevation: 16,
-          // column holds all the widgets in the drawer
-          child: Column(
-            children: <Widget>[
-              Expanded(
-                flex: 1,
-                child: Container(
-                  padding: const EdgeInsets.all(0.0),
-                  decoration: const BoxDecoration(
-                    color: Colors.black,
-                  ),
-                  child: Stack(
-                    children: [
-                      ...makeStar(MediaQuery.of(context).size.width,
-                          MediaQuery.of(context).size.height),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          Icon(
-                            FlutterIcons.cloud_ant,
-                            color: Colors.grey.shade100,
-                            size: 80.0,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width * 0.85,
-                height: 50,
-                decoration: BoxDecoration(
+  Container stratosSavedLocationTile(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.85,
+      height: 50,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        border: Border.all(
+          color: Colors.grey.shade300,
+        ),
+      ),
+      child: const Padding(
+        padding: EdgeInsets.fromLTRB(20, 12, 0, 0),
+        child: Text(
+          "Pinned Locations",
+          style: TextStyle(
+            fontFamily: 'Proxima',
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Container stratosMoreTile(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.85,
+      height: 50,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        border: Border.all(
+          color: Colors.grey.shade300,
+        ),
+      ),
+      child: const Padding(
+        padding: EdgeInsets.fromLTRB(20, 12, 0, 0),
+        child: Text(
+          "More",
+          style: TextStyle(
+            fontFamily: 'Proxima',
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget stratosHeader(BuildContext context) {
+    return Expanded(
+      flex: 1,
+      child: Container(
+        padding: const EdgeInsets.all(0.0),
+        decoration: const BoxDecoration(
+          color: Colors.black,
+        ),
+        child: Stack(
+          children: [
+            ...makeStar(MediaQuery.of(context).size.width,
+                MediaQuery.of(context).size.height),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Icon(
+                  FlutterIcons.cloud_ant,
                   color: Colors.grey.shade100,
-                  border: Border.all(
-                    color: Colors.grey.shade300,
-                  ),
+                  size: 80.0,
                 ),
-                child: const Padding(
-                  padding: EdgeInsets.fromLTRB(20, 12, 0, 0),
-                  child: Text(
-                    "Pinned Locations",
-                    style: TextStyle(
-                      fontFamily: 'Proxima',
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                    ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLocList() {
+    /*Reorderable buildReorderable(String myPlacesFullName,
+        Widget Function(Widget tile) transition, int index) {
+      return Reorderable(
+        key: UniqueKey(),
+        builder: (context, dragAnimation, inDrag) {
+          final tile = Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              _buildLocTile(context, index),
+              const Divider(height: 0),
+            ],
+          );
+          return AnimatedBuilder(
+            animation: dragAnimation,
+            builder: (context, _) {
+              final t = dragAnimation.value;
+              final color = Color.lerp(Colors.white, Colors.grey.shade100, t);
+
+              return Material(
+                color: color,
+                elevation: lerpDouble(0, 8, t)!,
+                child: transition(tile),
+              );
+            },
+          );
+        },
+      );
+    }
+
+    return ImplicitlyAnimatedReorderableList<String>(
+      key: _listKey,
+      items: myPlacesIds,
+      shrinkWrap: true,
+      reorderDuration: const Duration(milliseconds: 200),
+      liftDuration: const Duration(milliseconds: 300),
+      physics: const ClampingScrollPhysics(),
+      padding: EdgeInsets.zero,
+      areItemsTheSame: (oldItem, newItem) => oldItem == newItem,
+      onReorderStarted: (item, index) => setState(
+        () {},
+      ),
+      onReorderFinished: (movedPlace, from, to, newItems) {
+        onReorderFinished(newItems);
+      },
+      itemBuilder: (context, itemAnimation, myPlacesFullName, index) {
+        return buildReorderable(myPlacesFullName, (tile) {
+          return SizeTransition(
+            sizeFactor: itemAnimation,
+            //curve: Curves.easeInOut,
+            //animation: itemAnimation,
+            child: tile,
+          );
+        }, index);
+      },
+    ); */
+    return ListView.builder(
+      key: _listKey,
+      physics: const BouncingScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: myPlacesIds.length,
+      controller: scrollController,
+      itemBuilder: (context, index) {
+        return _buildLocTile(context, index);
+      },
+    );
+  }
+
+  ListTile _buildLocTile(BuildContext context, int index) {
+    final applicationBloc =
+        Provider.of<ApplicationBloc>(context, listen: false);
+    return ListTile(
+      onLongPress: () {
+        showModalBottomSheet(
+          backgroundColor: Colors.transparent,
+          context: context,
+          builder: (context) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
+              child: Container(
+                height: 250,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(15),
+                    topRight: Radius.circular(15),
                   ),
+                  color: Colors.white,
                 ),
-              ),
-              Expanded(
-                flex: 2,
-                child: (myPlacesIds.isEmpty)
-                    ? Container()
-                    : ListView.builder(
-                        padding: const EdgeInsets.all(0),
-                        physics: const ClampingScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: myPlacesIds.length,
-                        itemBuilder: (context, index) {
-                          return Dismissible(
-                            onDismissed: (direction) async {
-                              myPlacesIds.removeAt(index);
-                              myPlacesFullName.removeAt(index);
-                              myPlacesMainText.removeAt(index);
-                              myPlacesSecondaryText.removeAt(index);
-                              _saveList();
-                              setState(() {});
-                            },
-                            background: Container(
-                              child: Align(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: const <Widget>[
-                                    SizedBox(
-                                      width: 20,
-                                    ),
-                                    Icon(
-                                      Icons.delete_forever,
-                                      color: Colors.white,
-                                    ),
-                                    Text(
-                                      "Dismiss",
-                                      style: TextStyle(
-                                        fontFamily: 'Proxima',
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.white,
-                                      ),
-                                      textAlign: TextAlign.right,
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.fromLTRB(
-                                        0,
-                                        0,
-                                        20,
-                                        0,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                alignment: Alignment.centerRight,
-                              ),
-                              color: Colors.red,
-                            ),
-                            direction: DismissDirection.endToStart,
-                            key: UniqueKey(),
-                            child: ListTile(
-                              leading: const Icon(Icons.location_city),
-                              trailing: const Icon(Icons.arrow_left,
-                                  color: Colors.black),
-                              title: Text(
-                                myPlacesMainText[index],
-                                style: const TextStyle(
-                                  fontFamily: 'Proxima',
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              subtitle: Text(
-                                myPlacesSecondaryText[index],
-                                style: const TextStyle(
-                                  fontFamily: 'Proxima',
-                                  fontSize: 15,
-                                ),
-                              ),
-                              onTap: () async {
-                                previousCall = myPlacesIds[index];
-                                previousCallTypeCur = false;
-                                //weatherCall();
-                                rendering = true;
-                                toggleDrawer();
-                                setState(() {});
-                                log(rendering.toString());
-                                await applicationBloc
-                                    .setSelectedLocation(myPlacesIds[index]);
-                                cityName = myPlacesFullName[index];
-                                rendering = false;
-                              },
-                            ),
-                          );
-                        }),
-              ),
-              // This container holds the align
-              Align(
-                alignment: FractionalOffset.bottomCenter,
-                // This container holds all the children that will be aligned
-                // on the bottom and should not scroll with the above ListView
                 child: Column(
-                  children: <Widget>[
-                    const Divider(
-                      height: 0,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(
+                        18,
+                        20,
+                        0,
+                        25,
+                      ),
+                      width: double.infinity,
+                      child: Text(
+                        (index <= myPlacesMainText.length)
+                            ? myPlacesMainText[index]
+                            : "",
+                        style: const TextStyle(
+                          fontFamily: 'Proxima',
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
                     ),
                     ListTile(
-                      contentPadding: const EdgeInsets.fromLTRB(
-                        14,
-                        2,
-                        14,
-                        2,
+                      leading: const Icon(
+                        Icons.home,
                       ),
-                      trailing: const Icon(Icons.settings),
-                      title: const Text(
-                        'Settings',
-                        style: TextStyle(
+                      onTap: () async {
+                        Navigator.pop(context);
+
+                        if (myPlacesIds[index] != myHomeId) {
+                          scrollController.animateTo(0,
+                              duration: const Duration(milliseconds: 400),
+                              curve: Curves.easeInOutCirc);
+                          myHomeFullName = myPlacesFullName[index];
+                          myHomeId = myPlacesIds[index];
+                          myHomeMainText = myPlacesMainText[index];
+                          myHomeSecondaryText = myPlacesSecondaryText[index];
+
+                          myPlacesFullName.removeAt(index);
+                          myPlacesMainText.removeAt(index);
+                          myPlacesSecondaryText.removeAt(index);
+                          myPlacesIds.removeAt(index);
+                          myPlacesIds.insert(0, myHomeId);
+
+                          myPlacesFullName.insert(0, myHomeFullName);
+                          myPlacesMainText.insert(0, myHomeMainText);
+                          myPlacesSecondaryText.insert(0, myHomeSecondaryText);
+                          _saveHome();
+                          _saveList();
+                          setState(
+                            () {},
+                          );
+                        } else {
+                          myHomeId = "";
+                          myHomeFullName = "";
+                          myHomeSecondaryText = "";
+                          myHomeMainText = "";
+                          _saveHome();
+                          _saveList();
+                          setState(() {});
+                        }
+                      },
+                      title: Text(
+                        (myPlacesIds[index] != myHomeId)
+                            ? "Set as Home"
+                            : "Remove as home",
+                        style: const TextStyle(
                           fontFamily: 'Proxima',
-                          fontWeight: FontWeight.w600,
                           fontSize: 18,
                         ),
                       ),
-                      onTap: () {
-                        toggleDrawer();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SettingsPage(
-                              notifyParent: refresh,
-                            ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.red.withAlpha(60),
+                      ),
+                      child: ListTile(
+                        leading: const Icon(
+                          Icons.delete_forever,
+                          color: Colors.red,
+                        ),
+                        onTap: () async {
+                          Navigator.pop(context);
+                          if (myPlacesIds[index] == myHomeId) {
+                            myHomeId = "";
+                            myHomeFullName = "";
+                            myHomeSecondaryText = "";
+                            myHomeMainText = "";
+                          }
+                          if (index <= myPlacesIds.length) {
+                            myPlacesFullName.removeAt(index);
+                            myPlacesMainText.removeAt(index);
+                            myPlacesSecondaryText.removeAt(index);
+                            myPlacesIds.removeAt(index);
+                          } else {
+                            myPlacesFullName.removeLast();
+                            myPlacesMainText.removeLast();
+                            myPlacesSecondaryText.removeLast();
+                            myPlacesIds.removeLast();
+                          }
+                          _saveHome();
+                          _saveList();
+                          setState(
+                            () {},
+                          );
+                        },
+                        title: const Text(
+                          "Unpin",
+                          style: TextStyle(
+                            fontFamily: 'Proxima',
+                            fontSize: 18,
+                            color: Colors.red,
                           ),
-                        );
-                      },
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
+            );
+          },
+        );
+      },
+      trailing: (myPlacesIds[index] == myHomeId && index <= myPlacesIds.length)
+          ? const Icon(Icons.home)
+          : (myPlacesIds[index] != myHomeId && index <= myPlacesIds.length)
+              ? const Icon(Icons.location_city)
+              : null,
+      title: Text(
+        (index >= myPlacesMainText.length) ? "" : myPlacesMainText[index],
+        style: const TextStyle(
+          fontFamily: 'Proxima',
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
+        ),
+      ),
+      subtitle: Text(
+        (index >= myPlacesSecondaryText.length)
+            ? ""
+            : myPlacesSecondaryText[index],
+        style: const TextStyle(
+          fontFamily: 'Proxima',
+          fontSize: 15,
+        ),
+      ),
+      onTap: () async {
+        previousCall = myPlacesIds[index];
+        previousCallTypeCur = false;
+        rendering = true;
+        toggleDrawer();
+        setState(
+          () {},
+        );
+        log(rendering.toString());
+        await applicationBloc.setSelectedLocationNoSearch(myPlacesIds[index]);
+        cityName = myPlacesFullName[index];
+        rendering = false;
+      },
+    );
+  }
+
+  void onReorderFinished(List<String> newItems) {
+    scrollController.jumpTo(scrollController.offset);
+    setState(
+      () {
+        _saveHome();
+        _saveList();
+      },
+    );
+  }
+
+  ScrollController scrollController = ScrollController();
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        backgroundColor: Colors.blue.withAlpha(200),
+        resizeToAvoidBottomInset: false,
+        key: _scaffoldKey,
+        drawer: Drawer(
+          elevation: 16,
+          child: Column(
+            children: <Widget>[
+              stratosHeader(context),
+              stratosSavedLocationTile(context),
+              Expanded(
+                flex: 2,
+                child: MediaQuery.removePadding(
+                  context: context,
+                  removeTop: true,
+                  child: Scrollbar(
+                    child: /*ListView(
+                        controller: scrollController,
+                        children: <Widget>[*/
+                        _buildLocList(),
+                    //]),
+                  ),
+                ),
+              ),
+              stratosSettingsTile(context),
             ],
           ),
         ),

@@ -35,8 +35,9 @@ class _DailyCardState extends State<DailyCard> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6)),
               child: Column(
-                children: [
+                children: [/*
                   ListTile(
+                    dense: true,
                     contentPadding: const EdgeInsets.symmetric(
                         vertical: 0.0, horizontal: 12.0),
                     leading: BoxedIcon(
@@ -52,13 +53,13 @@ class _DailyCardState extends State<DailyCard> {
                       ),
                       textAlign: TextAlign.left,
                     ),
-                  ),
+                  ),*/
                   Container(
                     padding: const EdgeInsets.fromLTRB(
                       18,
+                      15,
                       0,
-                      0,
-                      25,
+                      20,
                     ),
                     width: double.infinity,
                     child: const Text(

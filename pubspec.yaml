@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+1
+version: 1.0.1+2
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
@@ -44,6 +44,7 @@ dependencies:
   geolocator: ^7.6.0
   google_geocoding: ^0.2.0
   http: ^0.13.3
+  implicitly_animated_reorderable_list: ^0.4.1
   intl: ^0.17.0
   material_floating_search_bar: ^0.3.4
   provider: ^5.0.0
@@ -86,7 +87,7 @@ flutter:
   # example:
   fonts:
     - family: Proxima
-      fonts: 
+      fonts:
         - asset: fonts/ProximaNova-Regular.otf
     - family: Roboto
       fonts:
@@ -114,8 +115,6 @@ flutter:
           weight: 900
         - asset: fonts/Roboto-BlackItalic.ttf
           weight: 900
-
-
   # fonts:
   #   - family: Schyler
   #     fonts:
