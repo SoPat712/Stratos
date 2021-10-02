@@ -104,6 +104,7 @@ class ApplicationBloc with ChangeNotifier {
     }
     notifyListeners();
   }
+
   setSelectedLocationNoSearch(String placeId) async {
     var sLocation = await placesService.getPlace(placeId);
     selectedLocation!.add(sLocation);
