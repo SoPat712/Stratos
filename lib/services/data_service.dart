@@ -26,7 +26,7 @@ class DataService {
         "&units=$unit&exclude=minutely&appid=" +
         appID!;
 
-    log("Url: " + url);
+    log('Url: ' + url);
     NetworkHelper networkHelper = NetworkHelper(url);
 
     var json = await networkHelper.getData();
