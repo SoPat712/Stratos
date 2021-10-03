@@ -38,7 +38,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-  // ignore: unused_field
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   AnimationController? animationController;
   String cityName = "";
@@ -50,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String myHomeFullName = "";
   String myHomeId = "";
   String myHomeMainText = "";
+  int indexrem = 0;
   String myHomeSecondaryText = "";
   List<String> myPlacesFullName = [];
   List<String> myPlacesIds = [];
@@ -526,7 +526,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           DailyCard(
             response: snapshot.data,
           ),
-          
         ],
       ),
     );
@@ -728,250 +727,260 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildLocList() {
-    /*Reorderable buildReorderable(String myPlacesFullName,
-        Widget Function(Widget tile) transition, int index) {
-      return Reorderable(
-        key: UniqueKey(),
-        builder: (context, dragAnimation, inDrag) {
-          final tile = Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              _buildLocTile(context, index),
-              const Divider(height: 0),
-            ],
-          );
-          return AnimatedBuilder(
-            animation: dragAnimation,
-            builder: (context, _) {
-              final t = dragAnimation.value;
-              final color = Color.lerp(Colors.white, Colors.grey.shade100, t);
-
-              return Material(
-                color: color,
-                elevation: lerpDouble(0, 8, t)!,
-                child: transition(tile),
-              );
-            },
-          );
-        },
-      );
-    }
-
-    return ImplicitlyAnimatedReorderableList<String>(
+    return AnimatedList(
       key: _listKey,
-      items: myPlacesIds,
-      shrinkWrap: true,
-      reorderDuration: const Duration(milliseconds: 200),
-      liftDuration: const Duration(milliseconds: 300),
       physics: const ClampingScrollPhysics(),
-      padding: EdgeInsets.zero,
-      areItemsTheSame: (oldItem, newItem) => oldItem == newItem,
-      onReorderStarted: (item, index) => setState(
-        () {},
-      ),
-      onReorderFinished: (movedPlace, from, to, newItems) {
-        onReorderFinished(newItems);
-      },
-      itemBuilder: (context, itemAnimation, myPlacesFullName, index) {
-        return buildReorderable(myPlacesFullName, (tile) {
-          return SizeTransition(
-            sizeFactor: itemAnimation,
-            //curve: Curves.easeInOut,
-            //animation: itemAnimation,
-            child: tile,
-          );
-        }, index);
-      },
-    ); */
-    return ListView.builder(
-      key: _listKey,
-      physics: const BouncingScrollPhysics(),
       shrinkWrap: true,
-      itemCount: myPlacesIds.length,
+      initialItemCount: myPlacesIds.length,
       controller: scrollController,
-      itemBuilder: (context, index) {
-        return _buildLocTile(context, index);
+      itemBuilder: (context, index, animation) {
+        if (index < myPlacesMainText.length) {
+          return _buildLocTile(context, index, animation);
+        } else {
+          return Container();
+        }
       },
     );
   }
 
-  ListTile _buildLocTile(BuildContext context, int index) {
+  Widget _buildLocTileOutAnimate(BuildContext context, animation,
+      String mainText, String secText, bool isHome) {
+    return SizeTransition(
+      axis: Axis.vertical,
+      sizeFactor: animation,
+      child: ListTile(
+        trailing: (isHome) ? const Icon(Icons.home) : null,
+        title: Text(
+          mainText,
+          style: const TextStyle(
+            fontFamily: 'Proxima',
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
+        ),
+        subtitle: Text(
+          secText,
+          style: const TextStyle(
+            fontFamily: 'Proxima',
+            fontSize: 15,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLocTile(BuildContext context, int index, animation) {
     final applicationBloc =
         Provider.of<ApplicationBloc>(context, listen: false);
-    return ListTile(
-      onLongPress: () {
-        showModalBottomSheet(
-          backgroundColor: Colors.transparent,
-          context: context,
-          builder: (context) {
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
-              child: Container(
-                height: 250,
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(15),
-                    topRight: Radius.circular(15),
+    return SizeTransition(
+      axis: Axis.vertical,
+      sizeFactor: animation,
+      child: ListTile(
+        onLongPress: () {
+          showSheet(context, index);
+        },
+        trailing:
+            (myPlacesIds[index] == myHomeId) ? const Icon(Icons.home) : null,
+        title: Text(
+          (index >= myPlacesMainText.length) ? "" : myPlacesMainText[index],
+          style: const TextStyle(
+            fontFamily: 'Proxima',
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
+        ),
+        subtitle: Text(
+          (index >= myPlacesSecondaryText.length)
+              ? ""
+              : myPlacesSecondaryText[index],
+          style: const TextStyle(
+            fontFamily: 'Proxima',
+            fontSize: 15,
+          ),
+        ),
+        onTap: () async {
+          previousCall = myPlacesIds[index];
+          previousCallTypeCur = false;
+          rendering = true;
+          toggleDrawer();
+          setState(
+            () {},
+          );
+          log(rendering.toString());
+          await applicationBloc.setSelectedLocationNoSearch(myPlacesIds[index]);
+          cityName = myPlacesFullName[index];
+          rendering = false;
+        },
+      ),
+    );
+  }
+
+  Future<dynamic> showSheet(BuildContext context, int index) {
+    return showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      context: context,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
+          child: Container(
+            height: 200,
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(15),
+                topRight: Radius.circular(15),
+              ),
+              color: Colors.white,
+            ),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.fromLTRB(
+                    18,
+                    20,
+                    0,
+                    25,
                   ),
-                  color: Colors.white,
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(
-                        18,
-                        20,
-                        0,
-                        25,
-                      ),
-                      width: double.infinity,
-                      child: Text(
-                        (index <= myPlacesMainText.length)
-                            ? myPlacesMainText[index]
-                            : "",
-                        style: const TextStyle(
-                          fontFamily: 'Proxima',
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                        ),
-                        textAlign: TextAlign.left,
-                      ),
+                  width: double.infinity,
+                  child: Text(
+                    (index < myPlacesMainText.length)
+                        ? myPlacesMainText[index]
+                        : "",
+                    style: const TextStyle(
+                      fontFamily: 'Proxima',
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
                     ),
-                    ListTile(
-                      leading: const Icon(
-                        Icons.home,
-                      ),
-                      onTap: () async {
-                        Navigator.pop(context);
+                    textAlign: TextAlign.left,
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(
+                    Icons.home,
+                  ),
+                  onTap: () async {
+                    Navigator.pop(context);
 
-                        if (myPlacesIds[index] != myHomeId) {
-                          scrollController.animateTo(0,
-                              duration: const Duration(milliseconds: 400),
-                              curve: Curves.easeInOutCirc);
-                          myHomeFullName = myPlacesFullName[index];
-                          myHomeId = myPlacesIds[index];
-                          myHomeMainText = myPlacesMainText[index];
-                          myHomeSecondaryText = myPlacesSecondaryText[index];
+                    if (myPlacesIds[index] != myHomeId) {
+                      scrollController.animateTo(0,
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.easeInOutCirc);
+                      myHomeFullName = myPlacesFullName[index];
+                      myHomeId = myPlacesIds[index];
+                      myHomeMainText = myPlacesMainText[index];
+                      myHomeSecondaryText = myPlacesSecondaryText[index];
+                      if (index != 0) {
+                        myPlacesIds.insert(0, myHomeId);
+                        myPlacesFullName.insert(0, myHomeFullName);
+                        myPlacesMainText.insert(0, myHomeMainText);
+                        myPlacesSecondaryText.insert(0, myHomeSecondaryText);
+                        _listKey.currentState!.insertItem(0,
+                            duration: const Duration(milliseconds: 200));
 
-                          myPlacesFullName.removeAt(index);
-                          myPlacesMainText.removeAt(index);
-                          myPlacesSecondaryText.removeAt(index);
-                          myPlacesIds.removeAt(index);
-                          myPlacesIds.insert(0, myHomeId);
-
-                          myPlacesFullName.insert(0, myHomeFullName);
-                          myPlacesMainText.insert(0, myHomeMainText);
-                          myPlacesSecondaryText.insert(0, myHomeSecondaryText);
-                          _saveHome();
-                          _saveList();
-                          setState(
-                            () {},
+                        await Future.delayed(const Duration(milliseconds: 200),
+                            () async {
+                          myPlacesFullName.removeAt(index + 1);
+                          myPlacesMainText.removeAt(index + 1);
+                          myPlacesSecondaryText.removeAt(index + 1);
+                          myPlacesIds.removeAt(index + 1);
+                          _listKey.currentState!.removeItem(
+                            index + 1,
+                            (context, animation) {
+                              return _buildLocTileOutAnimate(
+                                  context,
+                                  animation,
+                                  myPlacesMainText[0],
+                                  myPlacesSecondaryText[0],
+                                  true);
+                            },
+                            duration: const Duration(milliseconds: 200),
                           );
-                        } else {
+                          indexrem = index;
+                        });
+                      } else {
+                        myHomeFullName = myPlacesFullName[index];
+                        myHomeId = myPlacesIds[index];
+                        myHomeMainText = myPlacesMainText[index];
+                        myHomeSecondaryText = myPlacesSecondaryText[index];
+                        setState(() {});
+                      }
+                    } else {
+                      myHomeId = "";
+                      myHomeFullName = "";
+                      myHomeSecondaryText = "";
+                      myHomeMainText = "";
+                      setState(() {});
+                    }
+                    _saveHome();
+                    _saveList();
+                  },
+                  title: Text(
+                    (myPlacesIds[index] != myHomeId)
+                        ? "Set as Home"
+                        : "Remove as home",
+                    style: const TextStyle(
+                      fontFamily: 'Proxima',
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.red.withAlpha(60),
+                  ),
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.delete_forever,
+                      color: Colors.red,
+                    ),
+                    onTap: () async {
+                      bool isHome = false;
+                      Navigator.pop(context);
+                      if (myPlacesIds[index] == myHomeId) {
+                        isHome = true;
+                      }
+                      var mtext = myPlacesMainText[index];
+                      var stext = myPlacesSecondaryText[index];
+                      _listKey.currentState!.removeItem(
+                        index,
+                        (context, animation) => _buildLocTileOutAnimate(
+                          context,
+                          animation,
+                          mtext,
+                          stext,
+                          isHome,
+                        ),
+                        duration: const Duration(milliseconds: 200),
+                      );
+                      myPlacesFullName.removeAt(index);
+                      myPlacesMainText.removeAt(index);
+                      myPlacesSecondaryText.removeAt(index);
+                      myPlacesIds.removeAt(index);
+                      await Future.delayed(const Duration(milliseconds: 200),
+                          () {
+                        if (myPlacesIds[index] == myHomeId) {
                           myHomeId = "";
                           myHomeFullName = "";
                           myHomeSecondaryText = "";
                           myHomeMainText = "";
                           _saveHome();
-                          _saveList();
-                          setState(() {});
                         }
-                      },
-                      title: Text(
-                        (myPlacesIds[index] != myHomeId)
-                            ? "Set as Home"
-                            : "Remove as home",
-                        style: const TextStyle(
-                          fontFamily: 'Proxima',
-                          fontSize: 18,
-                        ),
+                      });
+                      _saveList();
+                    },
+                    title: const Text(
+                      "Unpin",
+                      style: TextStyle(
+                        fontFamily: 'Proxima',
+                        fontSize: 18,
+                        color: Colors.red,
                       ),
                     ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.red.withAlpha(60),
-                      ),
-                      child: ListTile(
-                        leading: const Icon(
-                          Icons.delete_forever,
-                          color: Colors.red,
-                        ),
-                        onTap: () async {
-                          Navigator.pop(context);
-                          if (myPlacesIds[index] == myHomeId) {
-                            myHomeId = "";
-                            myHomeFullName = "";
-                            myHomeSecondaryText = "";
-                            myHomeMainText = "";
-                          }
-                          if (index <= myPlacesIds.length) {
-                            myPlacesFullName.removeAt(index);
-                            myPlacesMainText.removeAt(index);
-                            myPlacesSecondaryText.removeAt(index);
-                            myPlacesIds.removeAt(index);
-                          } else {
-                            myPlacesFullName.removeLast();
-                            myPlacesMainText.removeLast();
-                            myPlacesSecondaryText.removeLast();
-                            myPlacesIds.removeLast();
-                          }
-                          _saveHome();
-                          _saveList();
-                          setState(
-                            () {},
-                          );
-                        },
-                        title: const Text(
-                          "Unpin",
-                          style: TextStyle(
-                            fontFamily: 'Proxima',
-                            fontSize: 18,
-                            color: Colors.red,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            );
-          },
+              ],
+            ),
+          ),
         );
-      },
-      trailing: (myPlacesIds[index] == myHomeId && index <= myPlacesIds.length)
-          ? const Icon(Icons.home)
-          : (myPlacesIds[index] != myHomeId && index <= myPlacesIds.length)
-              ? const Icon(Icons.location_city)
-              : null,
-      title: Text(
-        (index >= myPlacesMainText.length) ? "" : myPlacesMainText[index],
-        style: const TextStyle(
-          fontFamily: 'Proxima',
-          fontWeight: FontWeight.w600,
-          fontSize: 16,
-        ),
-      ),
-      subtitle: Text(
-        (index >= myPlacesSecondaryText.length)
-            ? ""
-            : myPlacesSecondaryText[index],
-        style: const TextStyle(
-          fontFamily: 'Proxima',
-          fontSize: 15,
-        ),
-      ),
-      onTap: () async {
-        previousCall = myPlacesIds[index];
-        previousCallTypeCur = false;
-        rendering = true;
-        toggleDrawer();
-        setState(
-          () {},
-        );
-        log(rendering.toString());
-        await applicationBloc.setSelectedLocationNoSearch(myPlacesIds[index]);
-        cityName = myPlacesFullName[index];
-        rendering = false;
       },
     );
   }
@@ -1007,11 +1016,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   context: context,
                   removeTop: true,
                   child: Scrollbar(
-                    child: /*ListView(
-                        controller: scrollController,
-                        children: <Widget>[*/
-                        _buildLocList(),
-                    //]),
+                    child: _buildLocList(),
                   ),
                 ),
               ),
