@@ -10,6 +10,7 @@ import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorder
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stratos/services/places_service.dart';
+import 'package:stratos/widgets/air_quality_card.dart';
 import 'package:stratos/widgets/icons/star.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -526,6 +527,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           DailyCard(
             response: snapshot.data,
           ),
+          AirQualityCard(
+            response: snapshot.data,
+          )
         ],
       ),
     );
