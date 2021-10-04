@@ -40,7 +40,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   AnimationController? animationController;
-  String cityName = "";
+  static String cityName = "";
   SharedPreferences? prefs;
   String currentQuery = "";
   bool disposeCalled = false;
@@ -74,10 +74,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  Future<void> setPrefs() async {
-    prefs = await SharedPreferences.getInstance();
-    return;
-  }
 
   @override
   void initState() {
@@ -105,10 +101,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void initUpdateVars() async {
     final applicationBloc =
         Provider.of<ApplicationBloc>(context, listen: false);
-    await setPrefs();
     _getHome();
     _getList();
-    if (myHomeId != "") {
+    if (myHomeId.isNotEmpty) {
       homeLocationCall();
     } else if (previousCallTypeCur) {
       currentLocationCall();

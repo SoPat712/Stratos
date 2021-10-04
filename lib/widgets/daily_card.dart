@@ -18,8 +18,8 @@ class _DailyCardState extends State<DailyCard> {
 
   @override
   Widget build(BuildContext context) {
-    final timeIcon = TimeIcon.fromDate(TimeHelper.getDateTimeSinceEpoch(
-        widget.response!.current!.dt, widget.response!.timezoneOffset));
+    //final timeIcon = TimeIcon.fromDate(TimeHelper.getDateTimeSinceEpoch(
+    //    widget.response!.current!.dt, widget.response!.timezoneOffset));
     return FutureBuilder(
         future: getTimes(),
         builder: (context, snapshot) {
