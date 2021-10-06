@@ -45,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   SharedPreferences? prefs;
   String currentQuery = "";
   bool disposeCalled = false;
+  bool homeSet = true;
   bool loading = false;
   StreamSubscription? locationSubscription;
   String myHomeFullName = "";
@@ -58,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   List<String> myPlacesSecondaryText = [];
   PlacesService places = PlacesService();
   String previousCall = "";
-  bool previousCallTypeCur = true;
+  bool previousCallTypeCur = false;
   bool rendering = false;
   Timer? timer;
 
@@ -88,7 +89,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     locationSubscription = applicationBloc.selectedLocation!.stream.listen(
       (place) async {
-        previousCallTypeCur = false;
         updateVars();
       },
     );
@@ -110,8 +110,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _getHome();
     _getList();
     if (myHomeId != "") {
+      homeSet = true;
+      previousCallTypeCur = false;
       homeLocationCall();
     } else if (previousCallTypeCur) {
+      previousCallTypeCur = true;
+
       currentLocationCall();
     }
     log(
@@ -258,6 +262,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   applicationBloc.setCurrentLocation();
                                 },
                               );
+                            } else if (homeSet) {
+                              applicationBloc
+                                  .setSelectedLocationNoSearch(myHomeId);
                             } else {
                               setState(
                                 () {
@@ -485,6 +492,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 () {},
               );
               previousCall = applicationBloc.searchResults![index].placeId;
+              homeSet = false;
               previousCallTypeCur = false;
               (applicationBloc.searchResults!.isNotEmpty)
                   ? await applicationBloc.setSelectedLocation(
@@ -805,6 +813,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         onTap: () async {
           previousCall = myPlacesIds[index];
           previousCallTypeCur = false;
+          if (myHomeId == myPlacesIds[index]) {
+            homeSet = true;
+            previousCallTypeCur = false;
+          } else {
+            homeSet = false;
+            previousCallTypeCur = false;
+          }
           rendering = true;
           toggleDrawer();
           setState(
