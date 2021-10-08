@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stratos/models/pollution.dart';
 import 'package:stratos/services/places_service.dart';
 import 'package:stratos/widgets/air_quality_card.dart';
 import 'package:stratos/widgets/icons/star.dart';
@@ -131,6 +132,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     await DataService.getWeather(
         applicationBloc.selectedLocationStatic!.geometry.location.lat,
         applicationBloc.selectedLocationStatic!.geometry.location.lng);
+    await DataService.getAirQuality(
+        applicationBloc.selectedLocationStatic!.geometry.location.lat,
+        applicationBloc.selectedLocationStatic!.geometry.location.lng);
     log("City name: " + cityName);
     setState(
       () {},
@@ -153,7 +157,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     await DataService.getWeather(
         applicationBloc.selectedLocationStatic!.geometry.location.lat,
         applicationBloc.selectedLocationStatic!.geometry.location.lng);
-
+    await DataService.getAirQuality(
+        applicationBloc.selectedLocationStatic!.geometry.location.lat,
+        applicationBloc.selectedLocationStatic!.geometry.location.lng);
     log("City name: " + cityName);
 
     setState(
@@ -535,9 +541,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           DailyCard(
             response: snapshot.data,
           ),
-          AirQualityCard(
-            response: snapshot.data,
-          )
+          FutureBuilder<Pollution>(
+              future: loadAirPol(),
+              builder: (context, snapshot2) {
+                return AirQualityCard(
+                  response: snapshot2.data,
+                  oneCall: snapshot.data,
+                );
+              })
         ],
       ),
     );
@@ -575,6 +586,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Future<Onecall?> loadOneCall() async {
     return await DataService.weatherData;
+  }
+
+  Future<Pollution> loadAirPol() async {
+    return await DataService.airQual;
   }
 
   Future<void> waitForASecond() async {
