@@ -63,7 +63,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool previousCallTypeCur = false;
   bool rendering = false;
   Timer? timer;
-  Pollution? airPol;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _start = 3;
@@ -91,7 +90,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     locationSubscription = applicationBloc.selectedLocation!.stream.listen(
       (place) async {
-        airPol = await loadAirPol();
         updateVars();
       },
     );
@@ -116,8 +114,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       homeSet = true;
       previousCallTypeCur = false;
       homeLocationCall();
-    } else {
+    } else if (previousCallTypeCur) {
       previousCallTypeCur = true;
+
       currentLocationCall();
     }
     log(
@@ -542,10 +541,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           DailyCard(
             response: snapshot.data,
           ),
-          AirQualityCard(
-            response: airPol,
-            oneCall: snapshot.data,
-          ),
+          FutureBuilder<Pollution>(
+              future: loadAirPol(),
+              builder: (context, snapshot2) {
+                return AirQualityCard(
+                  response: snapshot2.data,
+                  oneCall: snapshot.data,
+                );
+              })
         ],
       ),
     );
