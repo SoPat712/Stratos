@@ -16,7 +16,7 @@ class AirQualityCard extends StatefulWidget {
 class AirQualityCardState extends State<AirQualityCard> {
   final Color leftBarColor = const Color(0xff53fdd7);
   final Color rightBarColor = const Color(0xffff5182);
-  final double width = 7;
+  final double width = 5;
 
   late List<BarChartGroupData> rawBarGroups;
   late List<BarChartGroupData> showingBarGroups;
@@ -26,20 +26,16 @@ class AirQualityCardState extends State<AirQualityCard> {
   @override
   void initState() {
     super.initState();
-    final barGroup1 = makeGroupData(
-        0, widget.response!.listpol![0].components!.pm25! / 100, 12);
-    final barGroup2 = makeGroupData(
-        1, widget.response!.listpol![1].components!.pm25! / 100, 12);
-    final barGroup3 = makeGroupData(
-        2, widget.response!.listpol![2].components!.pm25! / 100, 5);
-    final barGroup4 = makeGroupData(
-        3, widget.response!.listpol![3].components!.pm25! / 100, 16);
-    final barGroup5 = makeGroupData(
-        4, widget.response!.listpol![4].components!.pm25! / 100, 6);
-    final barGroup6 = makeGroupData(
-        5, widget.response!.listpol![5].components!.pm25! / 100, 1.5);
-    final barGroup7 = makeGroupData(
-        6, widget.response!.listpol![6].components!.pm25! / 100, 1.5);
+    final barGroup1 =
+        makeGroupData(0, widget.response!.listpol![0].components!.pm25!, 12);
+    final barGroup2 =
+        makeGroupData(1, widget.response!.listpol![1].components!.pm25!, 12);
+    final barGroup3 =
+        makeGroupData(2, widget.response!.listpol![2].components!.pm25!, 5);
+    final barGroup4 =
+        makeGroupData(3, widget.response!.listpol![3].components!.pm25!, 16);
+    final barGroup5 =
+        makeGroupData(4, widget.response!.listpol![4].components!.pm25!, 6);
 
     final items = [
       barGroup1,
@@ -47,8 +43,6 @@ class AirQualityCardState extends State<AirQualityCard> {
       barGroup3,
       barGroup4,
       barGroup5,
-      barGroup6,
-      barGroup7,
     ];
 
     rawBarGroups = items;
